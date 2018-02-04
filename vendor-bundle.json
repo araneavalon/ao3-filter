@@ -1,0 +1,17 @@
+[
+  "autobind-decorator",
+  "babel-polyfill",
+  "classnames",
+  "lodash",
+  "lokijs",
+  "prop-types",
+  "jss",
+  "natural-compare",
+  "react",
+  "react-dom",
+  "react-jss",
+  "react-redux",
+  "redux",
+  "redux-thunk",
+  { "file": "querystring-es3", "expose": "querystring" }
+]

@@ -1,0 +1,15 @@
+{
+	"presets": [ "env" ],
+	"plugins": [
+		// transform-decorators-legacy must come before transform-class-properties
+		"transform-decorators-legacy",
+		"transform-class-properties",
+		"transform-object-rest-spread",
+		"transform-react-jsx",
+		[ "transform-regenerator", {
+			"async": false,
+			"asyncGenerators": false,
+			"generators": true
+		} ]
+	]
+}
