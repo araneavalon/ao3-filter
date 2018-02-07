@@ -10,17 +10,14 @@ import { Types } from '../reducer';
 
 import { Button } from 'av/elements';
 import { Searches } from 'searches';
+import { Works } from 'works';
 
 
 @jss( ( $ ) => ( {
 	container: {
 		...$.page,
-		position: 'absolute',
-		top: 0,
-		bottom: 0,
-		left: 0,
-		right: 0,
-		padding: [ '48px', '35%', '0px', '35%' ],
+		minHeight: '100%',
+		padding: [ '48px', '35%', '48px', '35%' ],
 	},
 	header: {
 		display: 'flex',
@@ -58,8 +55,7 @@ export class App extends React.Component {
 				{ page === 'searches' &&
 					<Searches /> }
 				{ page === 'works' &&
-					null // <Works /> }
-					}
+					<Works /> }
 			</div>
 		</div>;
 	}

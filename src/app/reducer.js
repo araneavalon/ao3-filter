@@ -7,8 +7,7 @@ import { SET_PAGE } from './actions';
 
 
 export const INITIAL_STATE = {
-	// page: 'works' TODO
-	page: 'searches'
+	page: 'works'
 };
 
 export const Types = {

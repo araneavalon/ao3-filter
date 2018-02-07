@@ -6,6 +6,7 @@
   "lokijs",
   "prop-types",
   "jss",
+  "moment",
   "natural-compare",
   "react",
   "react-dom",
@@ -13,5 +14,6 @@
   "react-redux",
   "redux",
   "redux-thunk",
+  "request-promise-native",
   { "file": "querystring-es3", "expose": "querystring" }
 ]

@@ -1,7 +1,7 @@
 'use strict';
 
 import querystring from 'querystring';
-const _fetch = fetch;
+const _fetch = window.fetch;
 
 export const fetch = ( ...args ) => _fetch( ...args );
 

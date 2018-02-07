@@ -19,7 +19,7 @@ app.use( '/build', express.static( path.resolve( __dirname, '../../', 'build/src
 
 app.use( '/', ( req, res, next ) =>
 	getDatabase()
-		.then( ( db ) => req.db = db )
+		.then( ( db ) => ( req.db = db ) )
 		.then( () => next() )
 		.catch( ( error ) => next( error ) ) );
 

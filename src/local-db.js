@@ -2,7 +2,6 @@
 
 import makeDatabase from 'av/local-db';
 
-export const ID_KEY = '$loki';
 export default makeDatabase( {
 	filename: 'ao3+.db',
 	options: {
