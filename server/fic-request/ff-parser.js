@@ -9,7 +9,7 @@ import { Parser } from './parser';
 const _parseNumber = ( v ) => Number( v.replace( ',', '' ) ),
 	_parseString = ( v ) => String( v );
 
-export class _FFNetParser extends Parser {
+export class _FFParser extends Parser {
 	static WORK_TYPE = 'ff';
 
 	static WORK_STAT_FORMATTERS = {
@@ -29,22 +29,22 @@ export class _FFNetParser extends Parser {
 					.filter( ( work ) => work ) );
 	}
 	work( $ ) {
-		const work = _.cloneDeep( _FFNetParser.DEFAULT_WORK );
+		const work = _.cloneDeep( _FFParser.DEFAULT_WORK );
 
-		work.id = () => Number( $( '.stitle' ).attr( 'href' ).match( /^\/s\/(\d+)\/1/ )[ 1 ] ) );
-		work.title = () => $( '.stitle' ).text().trim() );
+		work.id = () => Number( $( '.stitle' ).attr( 'href' ).match( /^\/s\/(\d+)\/1/ )[ 1 ] );
+		work.title = () => $( '.stitle' ).text().trim();
 
 		const author = $( 'a[href^="/u/"]' );
 		work.authors = () => [ [ author.text().trim(), `https://www.fanfiction.net/${author.attr( 'href' )}` ] ];
 
-		work.summary = () => $( '.z-indent.z-padtop' ).clone().children().remove().end().text().trim() );
+		work.summary = () => $( '.z-indent.z-padtop' ).clone().children().remove().end().text().trim();
 
 		const stats = $( '.z-indent.z-padtop > .z-padtop2.xgray' );
-		this.workStats( work, stats.text() ) );
+		this.workStats( work, stats.text() );
 
 		const dates = stats.find( 'span[data-xutime]' );
-		work.updated = () => Number( $( dates.get( 0 ) ).attr( 'data-xutime' ) ) );
-		work.published = () => Number( $( dates.get( ( dates.length > 1 ) ? 1 : 0 ) ).attr( 'data-xutime' ) ) );
+		work.updated = () => Number( $( dates.get( 0 ) ).attr( 'data-xutime' ) );
+		work.published = () => Number( $( dates.get( ( dates.length > 1 ) ? 1 : 0 ) ).attr( 'data-xutime' ) );
 
 		return work;
 	}
@@ -52,7 +52,7 @@ export class _FFNetParser extends Parser {
 		statsString.trim().split( ' - ' ).forEach( ( s, i, { length: l } ) => {
 			const m = s.match( /^(\w+?): (.+?)$/ );
 			if( m != null ) {
-				const f = _FFNetParser.WORK_STAT_FORMATTERS[ m[ 1 ] ];
+				const f = _FFParser.WORK_STAT_FORMATTERS[ m[ 1 ] ];
 				if( f != null ) {
 					const [ key, fn ] = f;
 					work[ key ] = fn( m[ 2 ] );
@@ -67,19 +67,19 @@ export class _FFNetParser extends Parser {
 				work.language = s;
 			} else if( i === 2 ) {
 				const genres = s.replace( 'Hurt/Comfort', '_HC_' ).split( '/' ).map( ( genre ) => genre.replace( '_HC_', 'Hurt/Comfort' ) );
-				works.tags.push( ...genres.map( ( genre ) => { type: 'genre', name: genre } ) );
+				work.tags.push( ...genres.map( ( genre ) => ( { type: 'genre', name: genre } ) ) );
 			} else if( i === ( l - 1 ) || i === ( l - 2 ) ) {
 				const c = s.split( /[\[\],]/g ).map( ( v ) => v.trim() ).filter( ( v ) => v ).sort();
-				works.tags.push( ...c.map( ( c ) => { type: 'character', name: c } ) );
+				work.tags.push( ...c.map( ( c ) => ( { type: 'character', name: c } ) ) );
 
 				const m = s.match( /\[.+?\]/g );
 				if( m != null ) {
 					const p = m.map( ( v ) => v.split( ',' ).map( ( v ) => v.replace( /[\[\]]/, '' ).trim() ).sort() );
-					works.tags.push( ...p.map( ( c ) => { type: 'relationship', characters: c } ) );
+					work.tags.push( ...p.map( ( c ) => ( { type: 'relationship', characters: c } ) ) );
 				}
 			}
 		} );
 	}
 }
 
-export const FFNetParser = new _FFNetParser();
+export const FFParser = new _FFParser();

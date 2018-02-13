@@ -12,8 +12,9 @@ export class _Ao3Parser extends Parser {
 	static WORK_TYPE = 'ao3';
 
 	works( html ) {
-		return Promise.resolve( cheerio.load( html ) )
-			.then( ( $ ) => Array.from( $( '.work.blurb.group' ) ) )
+		const $ = cheerio.load( html );
+		return Promise.resolve()
+			.then( () => $( '.work.blurb.group' ).toArray() )
 			.then( ( elements ) => Promise.all( elements.map( ( e ) => this.work( ( s ) => $( e ).find( s ) ) ) ) )
 			.then( ( works ) => works.filters( ( work ) => work ) );
 	}
@@ -34,8 +35,8 @@ export class _Ao3Parser extends Parser {
 				work.updated = () => $( '.header.module > .datetime' ).text();
 				work.rating = () => $( 'header.module > .required-tags .rating' ).attr( 'title' );
 				work.tags = () => _.flatten( [
-					$( '.header.module > .heading.fandoms a.tag' ).toArray().map( ( e ) => { type: 'fandom', name: $( e ).text() } ),
-					$( '.header.module > .required-tags .category' ).attr( 'title' ).split( ', ' ).map( ( t ) => { type: 'category', name: t } ),
+					$( '.header.module > .heading.fandoms a.tag' ).toArray().map( ( e ) => ( { type: 'fandom', name: $( e ).text() } ) ),
+					$( '.header.module > .required-tags .category' ).attr( 'title' ).split( ', ' ).map( ( t ) => ( { type: 'category', name: t } ) ),
 					$( '.tags > *' ).toArray().map( ( e ) => {
 						const type = $( e ).attr( 'class' ).split( ' ' )[ 0 ].slice( 0, -1 ),
 							value = $( e ).find( '.tag' ).text();

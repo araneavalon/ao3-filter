@@ -4,8 +4,8 @@
 import { Ao3Query } from './ao3-query';
 import { Ao3Parser } from './ao3-parser';
 
-import { FFNetQuery } from './ff-net-query';
-import { FFNetParser } from './ff-net-parser';
+import { FFQuery } from './ff-query';
+import { FFParser } from './ff-parser';
 
 import { Request } from './request';
 export { RequestCache } from './cache';
@@ -21,9 +21,9 @@ export class Ao3Request extends Request {
 }
 CombinedRequest.addRequest( Ao3Request );
 
-export class FFNetRequest extends Request {
+export class FFRequest extends Request {
 	constructor( ...args ) {
-		super( FFNetQuery, FFNetParser, ...args );
+		super( FFQuery, FFParser, ...args );
 	}
 }
-CombinedRequest.addRequest( FFNetRequest );
+CombinedRequest.addRequest( FFRequest );

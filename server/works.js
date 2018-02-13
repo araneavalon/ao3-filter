@@ -1,12 +1,12 @@
 'use strict';
 
 import { Router } from 'express';
-import { Ao3Request, FFNetRequest, CombinedRequest, RequestCache } from 'fic-request';
+import { Ao3Request, FFRequest, CombinedRequest, RequestCache } from 'fic-request';
 
 const SITES = {
 	all: CombinedRequest,
 	ao3: Ao3Request,
-	ff: FFNetRequest,
+	ff: FFRequest,
 };
 
 const route = new Router();

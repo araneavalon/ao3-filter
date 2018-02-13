@@ -5,7 +5,7 @@ import { Query } from './query';
 
 
 // TODO Add qs filtering, when available.
-export class FFNetQuery extends Query {
+export class FFQuery extends Query {
 	parseTitle( { not, value } ) {
 		return ( work ) => not( work.title === value );
 	}

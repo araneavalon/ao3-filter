@@ -1,4 +1,3 @@
-Rename FFNet to FF.
 Make sure all parsers and queries are using tags properly.
 Make sure that rating is not treated as a tag.
 Make sure that the work display ui handles the new work format.
