@@ -3,49 +3,23 @@
 import cheerio from 'cheerio';
 import _ from 'lodash';
 
+import { Parser } from './parser';
+
 
 const _parseNumber = ( v ) => Number( v.replace( ',', '' ) ),
 	_parseString = ( v ) => String( v );
 
-export class _FFNetParser {
-	static DEFAULT_WORK = {
-		type: 'ff',
-		id: null,
-		title: null,
-		author_id: null,
-		author: null,
-		summary: null,
-		rating: null,
-		language: null,
-		genre: '',
-		chapters: null,
-		words: null,
-		reviews: 0,
-		favourites: 0,
-		follows: 0,
-		updated: null,
-		published: null,
-		characters: [],
-		pairings: [],
-		complete: false,
-		errors: [],
-	}
+export class _FFNetParser extends Parser {
+	static WORK_TYPE = 'ff';
+
 	static WORK_STAT_FORMATTERS = {
 		Rated: [ 'rating', _parseString ],
 		Chapters: [ 'chapters', _parseNumber ],
 		Words: [ 'words', _parseNumber ],
-		Reviews: [ 'reviews', _parseNumber ],
-		Favs: [ 'favourites', _parseNumber ],
-		Follows: [ 'follows', _parseNumber ],
-	}
-
-	_workTry( work, key, fn ) {
-		try {
-			work[ key ] = fn();
-		} catch( e ) {
-			work.errors.push( `Unable to parse work.${key}: "${e.message}"` );
-		}
-	}
+		Reviews: [ 'comments', _parseNumber ],
+		Favs: [ 'kudos', _parseNumber ],
+		Follows: [ 'subscriptions', _parseNumber ],
+	};
 
 	works( html ) {
 		return Promise.resolve( cheerio.load( html ) )
@@ -57,48 +31,54 @@ export class _FFNetParser {
 	work( $ ) {
 		const work = _.cloneDeep( _FFNetParser.DEFAULT_WORK );
 
-		this._workTry( work, 'id', () => Number( $( '.stitle' ).attr( 'href' ).match( /^\/s\/(\d+)\/1/ )[ 1 ] ) );
-		this._workTry( work, 'title', () => $( '.stitle' ).text().trim() );
-		this._workTry( work, 'author_id', () => Number( $( 'a[href^="/u/"]' ).attr( 'href' ).match( /^\/u\/(\d+)/ )[ 1 ] ) );
-		this._workTry( work, 'author', () => $( 'a[href^="/u/"]' ).text().trim() );
-		this._workTry( work, 'summary', () => $( '.z-indent.z-padtop' ).clone().children().remove().end().text().trim() );
+		work.id = () => Number( $( '.stitle' ).attr( 'href' ).match( /^\/s\/(\d+)\/1/ )[ 1 ] ) );
+		work.title = () => $( '.stitle' ).text().trim() );
+
+		const author = $( 'a[href^="/u/"]' );
+		work.authors = () => [ [ author.text().trim(), `https://www.fanfiction.net/${author.attr( 'href' )}` ] ];
+
+		work.summary = () => $( '.z-indent.z-padtop' ).clone().children().remove().end().text().trim() );
 
 		const stats = $( '.z-indent.z-padtop > .z-padtop2.xgray' );
-		Object.assign( work, this.workStats( stats.text() ) );
+		this.workStats( work, stats.text() ) );
 
 		const dates = stats.find( 'span[data-xutime]' );
-		this._workTry( work, 'updated', () => Number( $( dates.get( 0 ) ).attr( 'data-xutime' ) ) );
-		this._workTry( work, 'published', () => Number( $( dates.get( ( dates.length > 1 ) ? 1 : 0 ) ).attr( 'data-xutime' ) ) );
+		work.updated = () => Number( $( dates.get( 0 ) ).attr( 'data-xutime' ) ) );
+		work.published = () => Number( $( dates.get( ( dates.length > 1 ) ? 1 : 0 ) ).attr( 'data-xutime' ) ) );
 
 		return work;
 	}
-	workStats( statsString ) {
-		const out = {};
+	workStats( work, statsString ) {
 		statsString.trim().split( ' - ' ).forEach( ( s, i, { length: l } ) => {
 			const m = s.match( /^(\w+?): (.+?)$/ );
 			if( m != null ) {
 				const f = _FFNetParser.WORK_STAT_FORMATTERS[ m[ 1 ] ];
 				if( f != null ) {
 					const [ key, fn ] = f;
-					out[ key ] = fn( m[ 2 ] );
+					work[ key ] = fn( m[ 2 ] );
 				}
 				return;
 			}
 			if( s === 'Complete' ) {
-				out.complete = true;
+				if( work.chapters[ 0 ] != null ) {
+					work.chapters[ 1 ] = work.chapters[ 0 ];
+				}
 			} else if( i === 1 ) {
-				out.language = s;
+				work.language = s;
 			} else if( i === 2 ) {
-				out.genre = s;
+				const genres = s.replace( 'Hurt/Comfort', '_HC_' ).split( '/' ).map( ( genre ) => genre.replace( '_HC_', 'Hurt/Comfort' ) );
+				works.tags.push( ...genres.map( ( genre ) => { type: 'genre', name: genre } ) );
 			} else if( i === ( l - 1 ) || i === ( l - 2 ) ) {
-				out.characters = s.split( /[\[\],]/g ).map( ( v ) => v.trim() ).filter( ( v ) => v ).sort();
+				const c = s.split( /[\[\],]/g ).map( ( v ) => v.trim() ).filter( ( v ) => v ).sort();
+				works.tags.push( ...c.map( ( c ) => { type: 'character', name: c } ) );
+
 				const m = s.match( /\[.+?\]/g );
 				if( m != null ) {
-					out.pairings = m.map( ( v ) => v.split( ',' ).map( ( v ) => v.replace( /[\[\]]/, '' ).trim() ).sort() );
+					const p = m.map( ( v ) => v.split( ',' ).map( ( v ) => v.replace( /[\[\]]/, '' ).trim() ).sort() );
+					works.tags.push( ...p.map( ( c ) => { type: 'relationship', characters: c } ) );
 				}
 			}
 		} );
-		return out;
 	}
 }
 

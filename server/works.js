@@ -1,7 +1,13 @@
 'use strict';
 
 import { Router } from 'express';
-import { Ao3Request, FFNetRequest, RequestCache } from 'fic-request';
+import { Ao3Request, FFNetRequest, CombinedRequest, RequestCache } from 'fic-request';
+
+const SITES = {
+	all: CombinedRequest,
+	ao3: Ao3Request,
+	ff: FFNetRequest,
+};
 
 const route = new Router();
 const cache = new RequestCache();
@@ -26,10 +32,8 @@ route.get( '/:site/page/:page', ( req, res ) => {
 		request = cache.get( request_id, terms );
 	}
 	if( request == null ) {
-		if( site === 'ff' ) {
-			request = new FFNetRequest( terms );
-		} else if( site === 'ao3' ) {
-			request = new Ao3Request( terms );
+		if( SITES[ site ] != null ) {
+			request = new SITES[ site ]( terms );
 		} else {
 			res.status( 400 ).json( { error: `Invalid site "${site}".` } );
 			return;

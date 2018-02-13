@@ -32,7 +32,7 @@ export class FFNetQuery extends Query {
 		return {
 			method: 'GET',
 			uri: 'https://www.fanfiction.net/anime/RWBY/',
-			qs: { p: page, srt: 1, lan: 1, r: 10, _c1: 107779, _c2: 107390 },
+			qs: { p: page, srt: 1, lan: 1, r: 10, _c1: 107779, _c2: 107390 }, // TODO
 		};
 	}
 }
