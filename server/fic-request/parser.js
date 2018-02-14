@@ -1,32 +1,32 @@
 'use strict';
 
-import _ from 'lodash';
 
 export class Parser {
-	static WORK_TYPE = null;
-	static DEFAULT_WORK = {
-		id: null,
-		title: null,
-		authors: [],
-		summary: null,
-		rating: null,
-		language: null,
-		chapters: [ null, null ],
-		words: 0,
-		hits: null,
-		kudos: null,
-		subscriptions: null,
-		comments: null,
-		bookmarks: null,
-		updated: null,
-		published: null,
-		series: [],
-		tags: [],
-		errors: [],
-	};
+	static get DEFAULT_WORK() {
+		return {
+			id: null,
+			title: null,
+			authors: [],
+			summary: null,
+			rating: null,
+			language: null,
+			chapters: [ null, null ],
+			words: 0,
+			hits: null,
+			kudos: null,
+			subscriptions: null,
+			comments: null,
+			bookmarks: null,
+			updated: null,
+			published: null,
+			series: [],
+			tags: [],
+			errors: [],
+		};
+	}
 
 	getBaseWork() {
-		const work = Object.assign( _.cloneDeep( this.constructor.DEFAULT_WORK ), { type: this.constructor.WORK_TYPE } );
+		const work = this.constructor.DEFAULT_WORK;
 		return new Proxy( work, {
 			apply: () => {
 				return work;

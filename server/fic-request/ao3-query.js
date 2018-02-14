@@ -12,41 +12,55 @@ export class Ao3Query extends Query {
 	}
 
 	parseTitle( { not, fuzzy, value } ) {
-		if( !fuzzy && !not() ) {
+		if( !not() && !fuzzy ) {
 			return { work_search: { title: value } };
 		}
 		return [
-			{ work_search: { query: not( `"${value}"` ) } },
-			fuzzy ? null : ( work ) => not( work.title === value )
+			( fuzzy || !not() ) &&
+				( { work_search: { query: not( `"${value}"` ) } } ),
+			!fuzzy &&
+				( ( work ) => not( work.title === value ) )
 		];
 	}
 	parseAuthor( { not, fuzzy, value } ) {
-		if( !fuzzy && !not() ) {
+		if( !not() && !fuzzy ) {
 			return { work_search: { creator: value } };
 		}
 		return [
-			{ work_search: { query: not( `"${value}"` ) } },
-			fuzzy ? null : ( work ) => not( work.author === value )
+			( fuzzy || !not() ) &&
+				( { work_search: { query: not( `"${value}"` ) } } ),
+			!fuzzy &&
+				( ( work ) => not( work.authors.find( ( [ author ] ) => author === value ) != null ) )
+		];
+	}
+	parseRating( { not, fuzzy, value } ) {
+		if( !not() && !fuzzy ) {
+			return { work_search: { other_tag_names: [ value ] } };
+		}
+		return [
+			( fuzzy || !not() ) &&
+				( { work_search: { query: not( `"${value}"` ) } } ),
+			!fuzzy &&
+				( ( work ) => not( work.rating === value ) )
 		];
 	}
 	parseComplete( { not } ) {
-		if( not() === false ) {
+		if( !not() ) {
 			return { work_search: { complete: '1' } };
-		} else if( not() === true ) {
-			return ( work ) => work.chapters[ 0 ] !== work.chapters[ 1 ]
+		} else {
+			return ( work ) => not( work.chapters[ 0 ] === work.chapters[ 1 ] )
 		}
-		return undefined;
 	}
 
 	parseTag( { not, fuzzy, exact, type, id, name } ) {
 		// 	TODO
-		// 		Implement querystring filtering, when available.
+		// 		Implement querystring id filtering, when available.
 		if( fuzzy ) {
 			return { work_search: { query: not( `"${name}"` ) } };
 		} else if( exact && type != null && id != null ) {
 			return { work_search: { query: not( `${this.getTagKey( type )}:${id}` ) } };
 		} else if( exact && name != null && !not() ) {
-			return { work_search: { other_tag_name: [ name ] } };
+			return { work_search: { other_tag_names: [ name ] } };
 		} else if( exact && name != null && not() ) {
 			return ( work ) => not( work.tags.find( ( { type: t, name: n } ) => ( type == null || t === type ) && n === name ) != null );
 		} else if( !exact && name != null ) {
@@ -58,35 +72,34 @@ export class Ao3Query extends Query {
 		return this.parseTag( term );
 	}
 	parseWarning( term ) {
-		return this.parseWarning( term );
+		return this.parseTag( term );
 	}
-	parsePairing( { not, exact, characters } ) {
+	parseRelationship( { not, exact, characters } ) {
 		// 	TODO
 		// 		Implement fuzzy
 		// 		Implement qs filtering when available.
 		return ( work ) => not( work.tags
-			.filter( ( { type } ) => type === 'pairing' )
+			.filter( ( { type } ) => type === 'relationship' )
 			.some( ( { characters: c } ) =>
 				( exact ? _.xor : _.difference )( characters, c ).length <= 0 ) );
 	}
-	parseCharacter( { not, name } ) {
+	parseCharacter( { not, exact, name } ) {
 		// 	TODO
 		// 		Implement fuzzy
-		// 		Implement querystring filtering when available.
+		// 		Implement qs filtering when available.
 		return ( work ) => {
 			const characters = [].concat(
+				!exact ?
+					work.tags
+						.filter( ( { type } ) => type === 'character' )
+						.map( ( { name } ) => name ) :
+					[],
 				work.tags
-					.filter( ( { type } ) => type === 'character' )
-					.map( ( { name } ) => name ),
-				work.tags
-					.filter( ( { type } ) => type == 'pairing' )
+					.filter( ( { type } ) => type == 'relationship' )
 					.reduce( ( o, { characters } ) => o.concat( characters ), [] )
 			);
 			return not( characters.includes( name ) );
 		}
-	}
-	parseCharacter( { not, name } ) {
-		return ( work ) => not( work.characters.includes( name ) );
 	}
 	parseFreeform( term ) {
 		return this.parseTag( term );
@@ -94,7 +107,7 @@ export class Ao3Query extends Query {
 
 	parseRarepairs( { not, pairings } ) {
 		return ( work ) => not( work.tags
-			.filter( ( { type } ) => type === 'pairing' )
+			.filter( ( { type } ) => type === 'relationship' )
 			.some( ( { characters: c } ) =>
 				pairings.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
 	}

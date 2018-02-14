@@ -1,7 +1,6 @@
 'use strict';
 
 import cheerio from 'cheerio';
-import _ from 'lodash';
 
 import { Parser } from './parser';
 
@@ -10,7 +9,9 @@ const _parseNumber = ( v ) => Number( v.replace( ',', '' ) ),
 	_parseString = ( v ) => String( v );
 
 export class _FFParser extends Parser {
-	static WORK_TYPE = 'ff';
+	static get DEFAULT_WORK() {
+		return Object.assign( super.DEFAULT_WORK, { site: 'ff' } );
+	}
 
 	static WORK_STAT_FORMATTERS = {
 		Rated: [ 'rating', _parseString ],
@@ -29,7 +30,7 @@ export class _FFParser extends Parser {
 					.filter( ( work ) => work ) );
 	}
 	work( $ ) {
-		const work = _.cloneDeep( _FFParser.DEFAULT_WORK );
+		const work = this.getBaseWork();
 
 		work.id = () => Number( $( '.stitle' ).attr( 'href' ).match( /^\/s\/(\d+)\/1/ )[ 1 ] );
 		work.title = () => $( '.stitle' ).text().trim();

@@ -1,6 +1,1 @@
-Make sure all parsers and queries are using tags properly.
-Make sure that rating is not treated as a tag.
 Make sure that the work display ui handles the new work format.
-Make sure that complete is checking the chapters like it should be.
-Make something that interleaves the two request streams.
-	Make sure that nothing is copying the cached works so that double-caching doesn't break like literally everything, lol.

@@ -157,14 +157,21 @@ gulp.task( '-watch:app', () => {
 	const b = watchify( browserify( options.watchify ) ),
 		_bundle = _makeBundle( b );
 	const bundle = () => {
-		const s = through.obj();
+		let continued = false;
+		const s = through.obj(),
+			next = () => {
+				if( !continued ) {
+					_bundle().pipe( s );
+				}
+				continued = true;
+			};
 		_lint( options.app.src, false )
 			.on( 'data', () => {} )
 			.on( 'error', ( error ) => s.emit( 'error', error ) )
 			// Just to be really really sure that it will actually catch the end.
-			.on( 'end', () => _bundle().pipe( s ) )
-			.on( 'close', () => _bundle().pipe( s ) )
-			.on( 'finish', () => _bundle().pipe( s ) );
+			.on( 'end', next )
+			.on( 'close', next )
+			.on( 'finish', next );
 		return s;
 	};
 	b.on( 'update', bundle );
@@ -174,9 +181,11 @@ gulp.task( '-watch:app', () => {
 
 
 gulp.task( 'deps:app', [ '-deps:app' ] );
+gulp.task( 'deps', sequence( 'deps:app' ) );
 
 gulp.task( 'lint:app', [ '-lint:app' ] );
 gulp.task( 'lint:server', [ '-lint:server' ] );
+gulp.task( 'lint', sequence( 'lint:server', 'lint:app' ) );
 
 gulp.task( 'build:prod:app', sequence( '-set:prod', '-lint:app', '-build:app' ) );
 gulp.task( 'build:dev:app', sequence( '-set:dev', '-lint:app', '-build:app' ) );

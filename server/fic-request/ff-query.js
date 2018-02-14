@@ -10,22 +10,34 @@ export class FFQuery extends Query {
 		return ( work ) => not( work.title === value );
 	}
 	parseAuthor( { not, value } ) {
-		return ( work ) => not( work.author[ 1 ] === value );
+		// ff works can only have one author.
+		return ( work ) => not( work.authors[ 0 ][ 0 ] === value );
+	}
+	parseRating( { not, value } ) {
+		return ( work ) => not( work.rating === value );
 	}
 	parseComplete( { not } ) {
-		return ( not() != null ) ?
-			( work ) => not( work.complete ) :
-			null;
+		return ( work ) => not( work.chapters[ 0 ] === work.chapters[ 1 ] );
 	}
-	parsePairing( { not, exact, characters } ) {
-		return ( work ) => not( work.pairings.some( ( c ) =>
-			( exact ? _.xor : _.difference )( characters, c ).length <= 0 ) );
+
+	parseRelationship( { not, exact, characters } ) {
+		return ( work ) => not( work.tags
+			.filter( ( { type } ) => type === 'relationship' )
+			.some( ( { characters: c } ) =>
+				( exact ? _.xor : _.difference )( characters, c ).length <= 0 ) );
 	}
 	parseCharacter( { not, name } ) {
-		return ( work ) => not( work.characters.includes( name ) );
+		// ff works can not have discrepencies between relationship characters and the character list.
+		return ( work ) => not( work.tags
+			.filter( ( { type } ) => type === 'character' )
+			.find( ( { name: n } ) => n === name ) != null );
 	}
+
 	parseRarepairs( { not, pairings } ) {
-		return ( work ) => not( work.pairings.some( ( w ) => pairings.find( ( p ) => _.xor( w, p ).length <= 0 ) == null ) );
+		return ( work ) => not( work.tags
+			.filter( ( { type } ) => type === 'relationship' )
+			.some( ( { characters: c } ) =>
+				pairings.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
 	}
 
 	page( page ) {

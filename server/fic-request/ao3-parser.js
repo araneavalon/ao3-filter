@@ -9,7 +9,9 @@ import { Parser } from './parser';
 
 
 export class _Ao3Parser extends Parser {
-	static WORK_TYPE = 'ao3';
+	static get DEFAULT_WORK() {
+		return Object.assign( super.DEFAULT_WORK, { site: 'ao3' } );
+	}
 
 	works( html ) {
 		const $ = cheerio.load( html );
@@ -38,11 +40,11 @@ export class _Ao3Parser extends Parser {
 					$( '.header.module > .heading.fandoms a.tag' ).toArray().map( ( e ) => ( { type: 'fandom', name: $( e ).text() } ) ),
 					$( '.header.module > .required-tags .category' ).attr( 'title' ).split( ', ' ).map( ( t ) => ( { type: 'category', name: t } ) ),
 					$( '.tags > *' ).toArray().map( ( e ) => {
-						const type = $( e ).attr( 'class' ).split( ' ' )[ 0 ].slice( 0, -1 ),
+						const type = $( e ).attr( 'class' ).split( ' ' )[ 0 ].slice( 0, -1 ), // Make singular
 							value = $( e ).find( '.tag' ).text();
 						switch( type ) {
-							case 'relationships':
-								return { type: 'relationship', characters: value.split( '/' ) };
+							case 'relationship':
+								return { type, characters: value.split( '/' ) };
 							default:
 								return { type, name: value };
 						}
@@ -54,12 +56,12 @@ export class _Ao3Parser extends Parser {
 					[ Number( $( e ).find( 'a' ).attr( 'href' ).replace( '/series/', '' ) ), $( e ).find( 'a' ).text() ]
 				] );
 				work.language = () => this.workStat( $, 'language' );
-				work.words = () => Number( this.workStat( $, 'words' ).replace( ',', '' ) );
+				work.words = () => this.workStat( $, 'words', true );
 				work.chapters = () => this.workStat( $, 'chapters' ).split( '/' ).map( ( c ) => ( c === '?' ) ? null : Number( c ) );
-				work.comments = () => Number( this.workStat( $, 'comments' ) );
-				work.kudos = () => Number( this.workStat( $, 'kudos' ) );
-				work.bookmarks = () => Number( this.workStat( $, 'bookmarks' ) );
-				work.hits = () => Number( this.workStat( $, 'hits' ) );
+				work.comments = () => this.workStat( $, 'comments', true );
+				work.kudos = () => this.workStat( $, 'kudos', true );
+				work.bookmarks = () => this.workStat( $, 'bookmarks', true );
+				work.hits = () => this.workStat( $, 'hits', true );
 			} ),
 			workHeading.then( ( { id } ) => this.workDates( id ) )
 		] ).then( ( [ work, { updated, published } ] ) => {
@@ -69,15 +71,18 @@ export class _Ao3Parser extends Parser {
 			return work;
 		} );
 	}
-	workStat( $, key ) {
-		return $( `.stats > dd.${key}` ).text();
+	workStat( $, key, isNumeric ) {
+		const v = $( `.stats > dd.${key}` ).text();
+		return isNumeric ?
+			Number( v.replace( ',', '' ) ) :
+			v;
 	}
 	workDates( id ) {
 		return request( {
 			method: 'GET',
 			uri: `https://archiveofourown.org/works/${id}`
 		} ).then( ( html ) => cheerio.load( html ) ).then( ( $ ) => ( {
-			updated: () => $( '.download > .expandable > li > a' ).first().attr( 'href' ).match( /\?updated_at=(\d+)$/ )[ 1 ],
+			updated: () => Number( $( '.download > .expandable > li > a' ).first().attr( 'href' ).match( /\?updated_at=(\d+)$/ )[ 1 ] ),
 			published: () => moment.utc( $( 'dd.published' ).text(), 'YYYY-MM-DD' ).unix(),
 		} ) );
 	}
