@@ -14,7 +14,6 @@ const cache = new RequestCache();
 
 
 route.use( '/', ( req, res, next ) => {
-	console.log( '/works', req.originalUrl );
 	if( req.query.terms != null ) {
 		req.query.terms = JSON.parse( req.query.terms );
 	}

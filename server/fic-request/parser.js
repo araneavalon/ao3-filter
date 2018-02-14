@@ -4,6 +4,7 @@
 export class Parser {
 	static get DEFAULT_WORK() {
 		return {
+			site: null,
 			id: null,
 			title: null,
 			authors: [],
@@ -37,12 +38,11 @@ export class Parser {
 					return true;
 				}
 				try {
-					work[ key ] = value();
-					return true;
+					work[ key ] = value( work[ key ] );
 				} catch( e ) {
 					work.errors.push( `Unable to parse work.${key}: "${e.message}"` );
-					return false;
 				}
+				return true;
 			}
 		} );
 	}

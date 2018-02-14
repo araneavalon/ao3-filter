@@ -15,6 +15,13 @@
 		"1": "#111",
 	},
 }, {
+	"borderColor": {
+		"normal": "$.grey.2",
+		"hover": "$.grey.1",
+	},
+
+
+
 	"button": {
 		"primary": {
 			"backgroundColor": "$.grey.4",

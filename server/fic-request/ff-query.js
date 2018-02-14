@@ -33,16 +33,19 @@ export class FFQuery extends Query {
 			.find( ( { name: n } ) => n === name ) != null );
 	}
 
-	parseRarepairs( { not, pairings } ) {
+	parseRarepairs( { not, relationships } ) {
 		return ( work ) => not( work.tags
 			.filter( ( { type } ) => type === 'relationship' )
 			.some( ( { characters: c } ) =>
-				pairings.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
+				relationships.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
 	}
 
 	page( page ) {
 		return {
 			method: 'GET',
+			headers: {
+				'if-modified-since': ( new Date() ).toUTCString(),
+			},
 			uri: 'https://www.fanfiction.net/anime/RWBY/',
 			qs: { p: page, srt: 1, lan: 1, r: 10, _c1: 107779, _c2: 107390 }, // TODO
 		};

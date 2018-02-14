@@ -10,12 +10,18 @@ const _parseNumber = ( v ) => Number( v.replace( ',', '' ) ),
 
 export class _FFParser extends Parser {
 	static get DEFAULT_WORK() {
-		return Object.assign( super.DEFAULT_WORK, { site: 'ff' } );
+		return Object.assign( super.DEFAULT_WORK, { site: 'www.fanfiction.net' } );
 	}
 
+	static RATINGS = {
+		'K': 'General',
+		'K+': 'Teen',
+		'T': 'Teen',
+		'M': 'Mature',
+	};
 	static WORK_STAT_FORMATTERS = {
-		Rated: [ 'rating', _parseString ],
-		Chapters: [ 'chapters', _parseNumber ],
+		Rated: [ 'rating', ( v ) => _FFParser.RATINGS[ _parseString( v ) ] ],
+		Chapters: [ 'chapters', ( v ) => [ _parseNumber( v ), null ] ],
 		Words: [ 'words', _parseNumber ],
 		Reviews: [ 'comments', _parseNumber ],
 		Favs: [ 'kudos', _parseNumber ],
@@ -27,7 +33,8 @@ export class _FFParser extends Parser {
 			.then( ( $ ) =>
 				Array.from( $( '.z-list.zhover.zpointer' ) )
 					.map( ( e ) => this.work( ( s ) => $( e ).find( s ) ) )
-					.filter( ( work ) => work ) );
+					.filter( ( work ) => work ) )
+					.then( ( works ) => works.sort( ( { updated: a }, { updated: b } ) => b - a ) );
 	}
 	work( $ ) {
 		const work = this.getBaseWork();

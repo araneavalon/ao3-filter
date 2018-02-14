@@ -1,10 +1,9 @@
 'use strict';
 
-import Request from './request';
+import { Request } from './request';
 
 
 export class CombinedRequest {
-
 	static Requests = [];
 	static addRequest( Request ) {
 		if( !this.Requests.includes( Request ) ) {
@@ -13,6 +12,9 @@ export class CombinedRequest {
 	}
 
 	constructor( terms, options = {} ) {
+		this.terms = terms;
+
+		this.maxTries = ( options.maxTries != null ) ? options.maxTries : Request.MAX_TRIES;
 		this.pageSize = ( options.pageSize != null ) ? options.pageSize : Request.PAGE_SIZE;
 
 		this.requests = CombinedRequest.Requests.map( ( Request ) => new Request( terms, options ) );
@@ -38,16 +40,16 @@ export class CombinedRequest {
 			return Promise.all( this.buffers );
 		} ).then( ( buffers ) => {
 			const out = [];
-			while( buffers.each( ( buffer ) => buffer.length > 0 ) ) {
-				let min = 0;
+			while( buffers.every( ( buffer ) => buffer.length > 0 ) ) {
+				let max = 0;
 				for( let i = 1; i < buffers.length; ++i ) {
-					const a = buffers[ min ][ 0 ].updated,
+					const a = buffers[ max ][ 0 ].updated,
 						b = buffers[ i ][ 0 ].updated;
-					if( b < a ) {
-						min = i;
+					if( b > a ) {
+						max = i;
 					}
 				}
-				out.push( buffers[ min ].shift() );
+				out.push( buffers[ max ].shift() );
 			}
 			return out;
 		} );
@@ -58,7 +60,7 @@ export class CombinedRequest {
 		}
 		return this.orderChunk()
 			.then( ( works ) => this.cache = this.cache.concat( works ) )
-			.then( this.fillCache( min ) );
+			.then( () => this.fillCache( min ) );
 	}
 
 	page( page = 1 ) {

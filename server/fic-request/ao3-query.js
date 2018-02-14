@@ -105,16 +105,19 @@ export class Ao3Query extends Query {
 		return this.parseTag( term );
 	}
 
-	parseRarepairs( { not, pairings } ) {
+	parseRarepairs( { not, relationships } ) {
 		return ( work ) => not( work.tags
 			.filter( ( { type } ) => type === 'relationship' )
 			.some( ( { characters: c } ) =>
-				pairings.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
+				relationships.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
 	}
 
 	page( page ) {
 		return {
 			method: 'GET',
+			headers: {
+				Cookie: 'user_credentials=84461e71bf7ac0f93c8c96a4231dace103dc00a99b6fd4a5c9a10d96c733ad21890c0500c83b04cf38449fda56b7cb7b78a64266b580fad9f5bcfd68519581d1::2195168::2018-02-27T13:29:49-05:00' // TODO
+			},
 			uri: 'https://archiveofourown.org/works',
 			qsStringifyOptions: { format: 'RFC1738' },
 			qs: _.mergeWith( {

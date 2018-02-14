@@ -6,17 +6,8 @@ import jss from 'react-jss';
 
 import * as Types from '../types';
 
-import { FFWork } from './ff-work';
-import { Ao3Work } from './ao3-work';
+import { Work } from './work';
 
-
-const getWorkComponent = ( type ) => {
-	switch( type ) {
-		case 'ff': return FFWork;
-		case 'ao3': return Ao3Work;
-		default: return 'div';
-	}
-};
 
 @jss( {
 
@@ -33,8 +24,7 @@ export class WorkList extends React.Component {
 		const { works } = this.props;
 		return <div>
 			{ works.map( ( work ) => {
-				const Work = getWorkComponent( work.type );
-				return <Work key={ work.id } { ...work } />
+				return <Work key={ work.id } work={ work } />
 			} ) }
 		</div>;
 	}
