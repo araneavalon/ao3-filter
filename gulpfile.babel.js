@@ -2,7 +2,7 @@
 
 import gulp from 'gulp';
 import sequence from 'gulp-sequence';
-import gutil from 'gulp-util';
+import gutil from './av/gulp-util';
 import { spawn } from 'child_process';
 
 import through from 'through2';
@@ -35,6 +35,7 @@ const options = {
 	get app() {
 		return {
 			root: './src',
+			assets: './static/',
 			src: 'src/**/*.js',
 			dest: 'build/src',
 			file: 'app.js',
@@ -155,28 +156,10 @@ gulp.task( '-start:server', ( cb ) => {
 
 gulp.task( '-watch:app', () => {
 	const b = watchify( browserify( options.watchify ) ),
-		_bundle = _makeBundle( b );
-	const bundle = () => {
-		let continued = false;
-		const s = through.obj(),
-			next = () => {
-				if( !continued ) {
-					_bundle().pipe( s );
-				}
-				continued = true;
-			};
-		_lint( options.app.src, false )
-			.on( 'data', () => {} )
-			.on( 'error', ( error ) => s.emit( 'error', error ) )
-			// Just to be really really sure that it will actually catch the end.
-			.on( 'end', next )
-			.on( 'close', next )
-			.on( 'finish', next );
-		return s;
-	};
-	b.on( 'update', bundle );
+		lintAndBundle = () => gutil.sequence( _lint( options.app.src, false ), _makeBundle( b ) );
+	b.on( 'update', lintAndBundle );
 	b.on( 'log', gutil.log );
-	bundle();
+	lintAndBundle();
 } );
 
 

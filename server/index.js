@@ -15,6 +15,7 @@ app.get( '/index.html', ( req, res ) => {
 	res.sendFile( 'static/index.html', { root: path.resolve( __dirname, '../../' ) } );
 } );
 
+app.use( '/static', express.static( path.resolve( __dirname, '../../', 'static' ), { index: false } ) );
 app.use( '/build', express.static( path.resolve( __dirname, '../../', 'build/src' ), { index: false } ) );
 
 app.use( '/', ( req, res, next ) =>

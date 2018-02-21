@@ -7,9 +7,10 @@ import cx from 'classnames';
 
 export const SolidIcon = ( props ) => <Icon { ...props } set="solid" />;
 export const RegularIcon = ( props ) => <Icon { ...props } set="regular" />;
+export const LightIcon = ( props ) => <Icon { ...props } set="light" />;
 
 
-const TYPES = {
+const SETS = {
 	regular: 'far',
 	solid: 'fas',
 	light: 'fal'
@@ -24,7 +25,7 @@ const TYPES = {
 
 export class Icon extends React.Component {
 	static propTypes = {
-		type: PropTypes.oneOf( [ 'regular', 'solid', 'light' ] ).isRequired,
+		set: PropTypes.oneOf( [ 'regular', 'solid', 'light' ] ).isRequired,
 		icon: PropTypes.string.isRequired,
 		className: PropTypes.string,
 		fixedWidth: PropTypes.bool,
@@ -46,7 +47,7 @@ export class Icon extends React.Component {
 
 	render() {
 		const {
-			type,
+			set,
 			icon,
 			className,
 			fixedWidth,
@@ -61,7 +62,7 @@ export class Icon extends React.Component {
 		} = this.props;
 
 		const classNames = cx( [
-			TYPES[ type ],
+			SETS[ set ],
 			'fa-' + icon,
 			fixedWidth && 'fa-fw',
 			size && 'fa-' + size,
@@ -80,6 +81,6 @@ export class Icon extends React.Component {
 			className={ classNames }
 			title={ title }
 			data-fa-transform={ dataFaTransform }
-			{ ...props }></i>;
+			{ ...props } />;
 	}
 }
