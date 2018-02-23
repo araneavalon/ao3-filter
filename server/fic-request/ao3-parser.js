@@ -29,7 +29,7 @@ export class _Ao3Parser extends Parser {
 				work.title = () => heading.find( 'a' ).first().text().trim();
 				work.authors = () =>
 					heading.find( 'a[rel="author"]' ).toArray().map( ( e ) =>
-						[ $( e ).text().trim(), `https://archiveofourown.org/${$( e ).attr( 'href' )}` ] );
+						[ $( e ).text().trim(), `https://archiveofourown.org${$( e ).attr( 'href' )}` ] );
 
 				return work;
 			} );

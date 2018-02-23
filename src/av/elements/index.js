@@ -1,5 +1,6 @@
 'use strict';
 
+export * from './link';
 export * from './label';
 export * from './button';
 export * from './checkbox';

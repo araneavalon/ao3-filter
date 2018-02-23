@@ -5,12 +5,8 @@ import PropTypes from 'prop-types';
 import cx from 'classnames';
 
 
-export const SolidIcon = ( props ) => <Icon { ...props } set="solid" />;
-export const RegularIcon = ( props ) => <Icon { ...props } set="regular" />;
-export const LightIcon = ( props ) => <Icon { ...props } set="light" />;
-
-
 const SETS = {
+	av: 'av',
 	regular: 'far',
 	solid: 'fas',
 	light: 'fal'
@@ -25,7 +21,7 @@ const SETS = {
 
 export class Icon extends React.Component {
 	static propTypes = {
-		set: PropTypes.oneOf( [ 'regular', 'solid', 'light' ] ).isRequired,
+		set: PropTypes.oneOf( [ 'av', 'regular', 'solid', 'light' ] ).isRequired,
 		icon: PropTypes.string.isRequired,
 		className: PropTypes.string,
 		fixedWidth: PropTypes.bool,

@@ -9,23 +9,35 @@ import cx from 'classnames';
 import * as Types from '../types';
 
 
-@jss( ( $ ) => ( {
+@jss( () => ( {
 	'icon': {
-		width: '25px',
-		height: '25px',
+		width: '40px',
+		height: '40px',
 		flexShrink: 0,
-		fontSize: '20px',
 
+		fontSize: '32px',
+
+		position: 'relative',
 		display: 'flex',
 		justifyContent: 'space-around',
 		alignItems: 'center',
 
 		'&:nth-child(odd)': {
-			marginRight: '3px',
+			marginRight: '5px',
 		},
 		'&:nth-child(3), &:nth-child(4)': {
-			marginTop: '3px',
+			marginTop: '5px',
 		},
+	},
+	hidden: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		maxWidth: '100%',
+		fontSize: '8px',
+		color: 'transparent',
+		cursor: 'default',
+		wordWrap: 'break-word',
 	},
 } ) )
 export class WorkIcon extends React.PureComponent {
@@ -42,6 +54,7 @@ export class WorkIcon extends React.PureComponent {
 		const { className, title, classes, children } = this.props;
 		return <div className={ cx( classes.icon, className ) } title={ title }>
 			{ children }
+			<span className={ classes.hidden }>{ title }</span>
 		</div>;
 	}
 }
@@ -50,28 +63,23 @@ export class WorkIcon extends React.PureComponent {
 @jss( ( $ ) => ( {
 	rating: {
 		fontWeight: 'bold',
-		textShadow: [
-			'-1px -1px 0 black',
-			'1px -1px 0 black',
-			'-1px 1px 0 black',
-			'1px 1px 0 black',
-		]
+		userSelect: 'none',
 	},
 
 	General: {
-		backgroundColor: '#77a600'
+		backgroundColor: $.colors.ao3Green,
 	},
-	Teen: {
-		backgroundColor: '#e8d506'
+	Teen: { // TODO FIX VISIBILITY ISSUE
+		backgroundColor: $.colors.ao3Yellow,
 	},
 	Mature: {
-		backgroundColor: '#e67300'
+		backgroundColor: $.colors.ao3Orange,
 	},
 	Explicit: {
-		backgroundColor: '#9a0000'
+		backgroundColor: $.colors.ao3Red,
 	},
 	Unrated: {
-		backgroundColor: 'white'
+		backgroundColor: 'white',
 	},
 } ) )
 export class Rating extends React.PureComponent {
@@ -85,77 +93,72 @@ export class Rating extends React.PureComponent {
 	render() {
 		const { rating, classes } = this.props,
 			text = ( rating !== 'Unrated' ) ? rating.slice( 0, 1 ) : '';
-		return <WorkIcon className={ cx( classes.rating, classes[ rating ] ) } title={ rating }>
-			{ text }
+		return <WorkIcon className={ classes[ rating ] } title={ rating }>
+			<span className={ classes.rating }>{ text }</span>
 		</WorkIcon>;
 	}
 }
 
 @jss( ( $ ) => ( {
-	category: {
-		'& path': {
-			stroke: 'black',
-			strokeWidth: '25',
-		},
-	},
-
 	Gen: {
-		backgroundColor: '#77a600'
+		backgroundColor: $.colors.ao3Green,
 	},
 	'F-F': {
-		backgroundColor: '#b80522'
+		backgroundColor: $.colors.ao3Red,
 	},
 	'M-M': {
-		backgroundColor: '#004dc3'
+		backgroundColor: $.colors.ao3Blue,
 	},
 	'F-M': {
-		backgroundColor: '#5e033c'
+		backgroundColor: $.colors.ao3Purple,
 	},
 	Multi: {
-		backgroundColor: 'green'
+		background: `linear-gradient(135deg, ${$.colors.ao3Green} 25%, ${$.colors.ao3Red} 45%, ${$.colors.ao3Purple} 55%, ${$.colors.ao3Blue})`,
 	},
 	Other: {
-		backgroundColor: 'black'
+		backgroundColor: 'black',
 	},
 	Unknown: {
-		backgroundColor: 'grey'
+		backgroundColor: 'white',
 	},
+	'ff-net': { // TODO FIGURE THIS OUT AND REMOVE
+		backgroundColor: $.colors.ffBlue
+	}
 } ) )
 export class Category extends React.PureComponent {
 	static displayName = __filename +  ':Category';
 
 	static propTypes = {
-		categories: PropTypes.arrayOf( PropTypes.oneOf( [ 'Gen', 'F/F', 'M/M', 'F/M', 'Multi', 'Other' ] ).isRequired ).isRequired,
+		categories: PropTypes.arrayOf( PropTypes.oneOf( [ 'Gen', 'F/F', 'M/M', 'F/M', 'Multi', 'Other', 'ff-net' ] ).isRequired ).isRequired,
 		classes: PropTypes.object.isRequired,
 	}
 
-	static Icons = {
-		Gen: { set: 'regular', icon: 'dot-circle' },
-		'F-F': { set: 'solid', icon: 'venus' },
-		'M-M': { set: 'solid', icon: 'mars' },
-		'F-M': { set: 'solid', icon: 'transgender' }, // Yes, I know, but it matches ao3.
-		Multi: null,
-		Other: { set: 'solid', icon: 'genderless' },
-		Unknown: null,
+	renderIcon( className ) {
+		switch( className ) {
+			case 'Gen': return <Icon set="regular" icon="dot-circle" />;
+			case 'F-F': return <Icon set="solid" icon="venus" />;
+			case 'M-M': return <Icon set="solid" icon="mars" />;
+			case 'F-M': return <Icon set="solid" icon="transgender" />; // I know, but it matches ao3.
+			case 'Other': return <Icon set="solid" icon="genderless" />;
+			default: return null;
+		}
 	}
-
 	render() {
 		const { categories, classes } = this.props,
 			className = ( categories.length > 1 ) ? 'Multi' : ( categories.length <= 0 ) ? 'Unknown' : categories[ 0 ].replace( /\//g, '-' ),
 			title = categories.join( ', ' ) || 'Unknown';
-		return <WorkIcon className={ cx( classes.category, classes[ className ] ) } title={ title }>
-			{ Category.Icons[ className ] &&
-				<Icon { ...Category.Icons[ className ] } /> }
+		return <WorkIcon className={ classes[ className ] } title={ title }>
+			{ this.renderIcon( className ) }
 		</WorkIcon>;
 	}
 }
 
 @jss( ( $ ) => ( {
 	'archiveofourown-org': {
-		backgroundColor: 'red'
+		backgroundColor: $.colors.ao3Red,
 	},
 	'www-fanfiction-net': {
-		backgroundColor: '#303e73'
+		backgroundColor: $.colors.ffBlue,
 	},
 } ) )
 export class Site extends React.PureComponent {
@@ -166,38 +169,23 @@ export class Site extends React.PureComponent {
 		classes: PropTypes.object.isRequired,
 	}
 
-	componentWillMount() {
-		window.FontAwesome.library.add( {
-			prefix: 'av',
-			iconName: 'ff-net',
-			icon: [ 180, 180, [], 'f003', 'M 45,49 H 113 V 18 H 14 V 172 H 45 Z M 113,126 H 68 V 172 h 45 z M 168,18 H 137 V 73 H 68 v 29 h 69 V 172 H 168 Z' ],
-		} );
-		// 'ff-net', [
-		// 	180, 180, [], 'f003',
-		// 	'M 45,49 H 113 V 18 H 14 V 172 H 45 Z M 113,126 H 68 V 172 h 45 z M 168,18 H 137 V 73 H 68 v 29 h 69 V 172 H 168 Z'
-		// ] );
-	}
-
 	render() {
 		const { site, classes } = this.props;
-		// TODO ICON
 		return <WorkIcon className={ classes[ site.replace( /\./g, '-' ) ] } title={ site }>
 			{ site === 'www.fanfiction.net' &&
-				<i className="av fa-ff-net" /> }
+				<Icon set="av" icon="ff-net" /> }
+			{ site === 'archiveofourown.org' &&
+				<Icon set="av" size="xs" icon="ao3" /> }
 		</WorkIcon>;
 	}
 }
 
-
 @jss( ( $ ) => ( {
-	'One-Shot': {
-		backgroundColor: 'green'
+	true: {
+		backgroundColor: $.colors.ao3Green,
 	},
-	Complete: {
-		backgroundColor: 'orange'
-	},
-	'Multi-Chapter': {
-		backgroundColor: 'red'
+	false: {
+		backgroundColor: $.colors.ao3Red,
 	},
 } ) )
 export class Length extends React.PureComponent {
@@ -214,8 +202,11 @@ export class Length extends React.PureComponent {
 			isOneShot = isComplete && chapters[ 0 ] === 1,
 			title = isOneShot ? 'One-Shot' : isComplete ? 'Complete' : 'Multi-Chapter';
 		// TODO ICON
-		return <WorkIcon className={ classes[ title ] } title={ title }>
-			
+		return <WorkIcon className={ classes[ isComplete ] } title={ title }>
+			{ !isComplete &&
+				<Icon set="solid" icon="ban" /> }
+			{ isComplete &&
+				<Icon set="solid" icon="check" /> }
 		</WorkIcon>;
 	}
 }

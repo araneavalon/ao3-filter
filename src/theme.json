@@ -14,6 +14,16 @@
 		"2": "#222",
 		"1": "#111",
 	},
+
+	"colors": {
+		"ffBlue": "#303e73",
+		"ao3Green": "#77a600",
+		"ao3Yellow": "#e8d506",
+		"ao3Orange": "#e67300",
+		"ao3Red": "#970000",
+		"ao3Purple": "#5e033c",
+		"ao3Blue": "#004dc3",
+	}
 }, {
 	"borderColor": {
 		"normal": "$.grey.2",
@@ -62,5 +72,6 @@
 	"page": {
 		"color": "$.grey.e",
 		"backgroundColor": "$.grey.3",
+		"fontSize": "16px",
 	},
 } ]

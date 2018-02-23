@@ -32,20 +32,20 @@ export class RequestCache {
 		}
 	}
 
-	add( r ) {
-		const id = this.getId( r.terms );
-		this.cache[ id ] = [ this.getTimestamp(), r ];
+	add( request ) {
+		const id = this.getId( request.terms );
+		this.cache[ id ] = [ this.getTimestamp(), request ];
 		return id;
 	}
-	get( id, t ) {
+	get( id, terms ) {
 		this.validate();
 		if( this.cache[ id ] ) {
 			return this.cache[ id ][ 1 ];
 		}
-		if( t ) {
-			const r = this.get( this.getId( t ) );
-			if( r ) {
-				return r;
+		if( terms ) {
+			const request = this.get( this.getId( terms ) );
+			if( request ) {
+				return request;
 			}
 		}
 		return null;
