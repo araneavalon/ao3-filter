@@ -6,13 +6,23 @@ import jss from 'react-jss';
 import cx from 'classnames';
 
 
-@jss( () => ( {
+@jss( ( $ ) => ( {
 	link: {
-		color: '#5998d6', // TODO THEME
+		textDecoration: 'none',
+		borderBottom: [ '1px', 'solid' ],
 
-		'&:visited': {
-			color: '#999', // TODO THEME
-		}
+		'&.blue': {
+			color: $.link.blue,
+			'&:visited': {
+				color: $.link.visited,
+			}
+		},
+		'&.light': {
+			color: $.link.light,
+			'&:visited': {
+				color: $.link.visited,
+			},
+		},
 	}
 } ) )
 export class Link extends React.PureComponent {

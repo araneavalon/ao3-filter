@@ -4,6 +4,7 @@
   "description": "Please, let us make blacklists ;-;",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "debug": "^3.1.0",
     "express": "^4.16.2",
     "lokijs": "^1.5.1",
     "request": "^2.83.0",

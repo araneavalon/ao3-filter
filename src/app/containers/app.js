@@ -27,7 +27,16 @@ import { Works } from 'works';
 	},
 	content: {
 		marginTop: $.margin.large
-	}
+	},
+
+	'@global': {
+		'.landmark': {
+			fontSize: 0,
+			lineHeight: 0,
+			opacity: 0,
+			height: 0,
+		},
+	},
 } ) )
 @connect(
 	( { app: { page } } ) => ( { page } ),

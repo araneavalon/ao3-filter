@@ -1,8 +1,11 @@
 'use strict';
 
 import cheerio from 'cheerio';
+import _ from 'lodash';
 
 import { Parser } from './parser';
+
+import characters from './tags-ff-rwby.js';
 
 
 const _parseNumber = ( v ) => Number( v.replace( ',', '' ) ),
@@ -10,7 +13,13 @@ const _parseNumber = ( v ) => Number( v.replace( ',', '' ) ),
 
 export class _FFParser extends Parser {
 	static get DEFAULT_WORK() {
-		return Object.assign( super.DEFAULT_WORK, { site: 'www.fanfiction.net' } );
+		return Object.assign( super.DEFAULT_WORK, {
+			site: 'www.fanfiction.net',
+			tags: [
+				{ type: 'fandom', name: 'anime/RWBY' }, // TODO
+				{ type: 'warning', name: 'Creator Chose Not To Use Archive Warnings' },
+			],
+		} );
 	}
 
 	static RATINGS = {
@@ -43,7 +52,7 @@ export class _FFParser extends Parser {
 		work.title = () => $( '.stitle' ).text().trim();
 
 		const author = $( 'a[href^="/u/"]' );
-		work.authors = () => [ [ author.text().trim(), `https://www.fanfiction.net/${author.attr( 'href' )}` ] ];
+		work.authors = () => [ [ author.text().trim(), author.attr( 'href' ).match( /\/u\/(\d+)/ )[ 1 ] ] ];
 
 		work.summary = () => $( '.z-indent.z-padtop' ).clone().children().remove().end().text().trim();
 
@@ -77,16 +86,29 @@ export class _FFParser extends Parser {
 				const genres = s.replace( 'Hurt/Comfort', '_HC_' ).split( '/' ).map( ( genre ) => genre.replace( '_HC_', 'Hurt/Comfort' ) );
 				work.tags.push( ...genres.map( ( genre ) => ( { type: 'genre', name: genre } ) ) );
 			} else if( i === ( l - 1 ) || i === ( l - 2 ) ) {
-				const c = s.split( /[\[\],]/g ).map( ( v ) => v.trim() ).filter( ( v ) => v ).sort();
+				const _c = s.split( /[\[\],]/g ).map( ( v ) => v.trim() ).filter( ( v ) => v ).sort(),
+					c = this.fixCharacters( _c );
 				work.tags.push( ...c.map( ( c ) => ( { type: 'character', name: c } ) ) );
 
 				const m = s.match( /\[.+?\]/g );
 				if( m != null ) {
 					const p = m.map( ( v ) => v.split( ',' ).map( ( v ) => v.replace( /[\[\]]/, '' ).trim() ).sort() );
-					work.tags.push( ...p.map( ( c ) => ( { type: 'relationship', characters: c } ) ) );
+					work.tags.push( ...p.map( ( c ) => ( { type: 'relationship', characters: this.fixCharacters( c ) } ) ) );
 				}
 			}
 		} );
+	}
+
+	fixCharacters( c ) {
+		return _( c )
+			.map( ( character ) => characters.find( ( { name } ) => character === name ) )
+			.map( ( { name, canonical, expand } ) =>
+				// TODO Allow adjusting tag display names.
+				[ canonical ? canonical : name ].concat( expand ) )
+			.flatten()
+			.uniq()
+			.filter( ( name ) => name )
+			.value();
 	}
 }
 

@@ -43,9 +43,6 @@ export class FFQuery extends Query {
 	page( page ) {
 		return {
 			method: 'GET',
-			headers: {
-				'if-modified-since': ( new Date() ).toUTCString(),
-			},
 			uri: 'https://www.fanfiction.net/anime/RWBY/',
 			qs: { p: page, srt: 1, lan: 1, r: 10, _c1: 107779, _c2: 107390 }, // TODO
 		};

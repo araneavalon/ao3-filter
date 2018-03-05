@@ -15,9 +15,16 @@ import cx from 'classnames';
 		display: 'inline-block',
 		padding: [ $.margin.small, $.margin.large ],
 		userSelect: 'none',
-		...$.button.primary,
-		'&:hover': { ...$.button.hover },
-		'&:active': { ...$.button.active },
+
+		backgroundColor: $.backgroundColor.normal,
+		borderColor: $.borderColor.normal,
+		'&:hover': {
+			backgroundColor: $.backgroundColor.hover,
+			borderColor: $.borderColor.hover,
+		},
+		'&:active': {
+			backgroundColor: $.backgroundColor.active,
+		},
 	}
 } ) )
 export class Button extends React.PureComponent {

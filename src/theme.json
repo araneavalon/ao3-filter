@@ -3,6 +3,11 @@
 		"small": "4px",
 		"large": "9px",
 	},
+	"fontSize": {
+		"small": ".85rem",
+		"normal": "1rem",
+		"large": "1.15rem",
+	},
 
 	"grey": {
 		"e": "#eee",
@@ -23,30 +28,40 @@
 		"ao3Red": "#970000",
 		"ao3Purple": "#5e033c",
 		"ao3Blue": "#004dc3",
-	}
+
+		"lightest": "white",
+		"lighter": "#999",
+		"light": "#666",
+		"mid": "#555",
+		"dark": "#444",
+		"darker": "#222",
+		"darkest": "#111",
+	},
 }, {
+	"page": {
+		"color": "#eee",
+		"backgroundColor": "#333",
+		"fontSize": "16px",
+		"lineHeight": "1.286",
+	},
+
 	"borderColor": {
-		"normal": "$.grey.2",
-		"hover": "$.grey.1",
+		"normal": "$.colors.darker",
+		"hover": "$.colors.darkest",
+	},
+	"backgroundColor": {
+		"normal": "$.colors.dark",
+		"hover": "$.colors.mid",
+		"active": "$.colors.light",
 	},
 
-
-
-	"button": {
-		"primary": {
-			"backgroundColor": "$.grey.4",
-			"borderColor": "$.grey.2",
-		},
-		"hover": {
-			"color": "$.grey.9",
-			"backgroundColor": "$.grey.5",
-			"borderColor": "$.grey.1"
-		},
-		"active": {
-			"color": "$.grey.4",
-			"backgroundColor": "$.grey.6",
-		}
+	"link": {
+		"blue": "#5998d6",
+		"light": "$.colors.lightest",
+		"dark": "$.colors.darkest",
+		"visited": "$.colors.lighter",
 	},
+
 	"checkbox": {
 		"checked": {
 
@@ -61,17 +76,5 @@
 
 		}
 	},
-	"list": {
-		"even": {
-			"backgroundColor": "$.grey.4"
-		},
-		"odd": {
-			"backgroundColor": "$.grey.3"
-		}
-	},
-	"page": {
-		"color": "$.grey.e",
-		"backgroundColor": "$.grey.3",
-		"fontSize": "16px",
-	},
+	
 } ]

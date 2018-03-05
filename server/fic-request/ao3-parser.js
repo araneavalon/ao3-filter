@@ -29,7 +29,7 @@ export class _Ao3Parser extends Parser {
 				work.title = () => heading.find( 'a' ).first().text().trim();
 				work.authors = () =>
 					heading.find( 'a[rel="author"]' ).toArray().map( ( e ) =>
-						[ $( e ).text().trim(), `https://archiveofourown.org${$( e ).attr( 'href' )}` ] );
+						[ $( e ).text().trim(), ...$( e ).attr( 'href' ).match( /^\/users\/(.+)\/pseuds\/(.+)$/ ).slice( 1, 3 ) ] );
 
 				return work;
 			} );
@@ -66,7 +66,7 @@ export class _Ao3Parser extends Parser {
 				] );
 				work.summary = () => $( '.userstuff.summary p' ).toArray().map( ( e ) => $( e ).text().trim() ).join( '\n' )
 				work.series = () => $( '.series > *' ).toArray().map( ( e ) => [
-					Number( $( e ).find( 'string' ).text() ), // Part
+					Number( $( e ).find( 'strong' ).text() ), // Part
 					$( e ).find( 'a' ).text(), // Name
 					Number( $( e ).find( 'a' ).attr( 'href' ).replace( '/series/', '' ) ), // Id
 				] );

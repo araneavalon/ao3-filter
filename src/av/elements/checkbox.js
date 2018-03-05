@@ -10,15 +10,14 @@ import { Icon } from 'av/react-font-awesome';
 
 
 @jss( ( $ ) => ( {
-	base: {
+	container: {
+		cursor: 'pointer',
+		userSelect: 'none',
+		color: $.colors.lightest,
 
+		'& .true': {},
+		'& .false': {},
 	},
-	true: {
-
-	},
-	false: {
-
-	}
 } ) )
 export class Checkbox extends React.PureComponent {
 	static displayName = __filename + ':Checkbox';
@@ -26,42 +25,39 @@ export class Checkbox extends React.PureComponent {
 	static propTypes = {
 		style: PropTypes.object,
 		className: PropTypes.string,
-		disabled: PropTypes.bool,
+		// disabled: PropTypes.bool,
 		value: PropTypes.bool,
-		onClick: PropTypes.func,
-		classes: PropTypes.object.isRequired
+		onChange: PropTypes.func.isRequired,
+		classes: PropTypes.object.isRequired,
 	}
 
 	@autobind
-	onClick() {
-		const { value, onClick } = this.props;
-		if( onClick ) {
-			onClick( !value );
-		}
+	onChange() {
+		const { value, onChange } = this.props;
+		onChange( !value );
 	}
 
 	render() {
-		const{ style, className, classes, value } = this.props;
-		return <Icon
-			icon={ value ? 'check-square' : 'square' }
-			className={ cx( classes.base, classes[ !!value ], className ) }
+		const{ style, className, classes, value } = this.props,
+			icon = value ? 'check-square' : 'square';
+		return<div
+			key={ value }
+			className={ cx( classes.container, String( !!value ), className ) }
 			style={ style }
-			onClick={ this.onClick }/>
+			onClick={ this.onClick }
+		><Icon set="regular" size="lg" icon={ icon } /></div>;
 	}
 }
 
 @jss( ( $ ) => ( {
-	base: {
+	container: {
+		cursor: 'pointer',
+		userSelect: 'none',
+		color: $.colors.lightest,
 
-	},
-	true: {
-
-	},
-	false: {
-
-	},
-	null: {
-
+		'& .true': {},
+		'& .false': {},
+		'& .null': {},
 	},
 } ) )
 export class TriCheckbox extends React.PureComponent {
@@ -70,10 +66,10 @@ export class TriCheckbox extends React.PureComponent {
 	static propTypes = {
 		style: PropTypes.object,
 		className: PropTypes.string,
-		disabled: PropTypes.bool,
+		// disabled: PropTypes.bool,
 		value: PropTypes.bool,
-		onClick: PropTypes.func,
-		classes: PropTypes.object.isRequired
+		onChange: PropTypes.func.isRequired,
+		classes: PropTypes.object.isRequired,
 	}
 
 	static defaultProps = {
@@ -82,20 +78,18 @@ export class TriCheckbox extends React.PureComponent {
 
 	@autobind
 	onClick() {
-		const { value, onClick } = this.props;
-		if( onClick ) {
-			if( value == null ) {
-				onClick( true );
-			} else if( value ) {
-				onClick( false );
-			} else {
-				onClick( null );
-			}
+		const { value, onChange } = this.props;
+		if( value == null ) {
+			onChange( true );
+		} else if( value ) {
+			onChange( false );
+		} else {
+			onChange( null );
 		}
 	}
 
 	getIcon( value ) {
-		if( value === null ) {
+		if( value == null ) {
 			return 'square';
 		} else if( value ) {
 			return 'plus-square';
@@ -105,11 +99,13 @@ export class TriCheckbox extends React.PureComponent {
 	}
 
 	render() {
-		const{ style, className, classes, value } = this.props;
-		return <Icon
-			icon={ this.getIcon( value ) }
-			className={ cx( classes.base, classes[ value ], className ) }
+		const{ style, className, classes, value } = this.props,
+			icon = this.getIcon( value );
+		return <div
+			key={ value }
+			className={ cx( classes.container, String( value ), className ) }
 			style={ style }
-			onClick={ this.onClick }/>
+			onClick={ this.onClick }
+		><Icon set="regular" size="lg" icon={ icon } /></div>;
 	}
 }

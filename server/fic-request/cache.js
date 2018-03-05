@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 
 export class RequestCache {
-	static TIMEOUT = 10 * 60;
+	static TIMEOUT = 10 * 60; // Seconds
 
 	constructor( options = {} ) {
 		this.timeout = ( options.timeout != null ) ? options.timeout : RequestCache.TIMEOUT;
@@ -22,7 +22,7 @@ export class RequestCache {
 
 	validate() {
 		const now = this.getTimestamp();
-		for( const id in Object.keys( this.cache ) ) {
+		for( const id of Object.keys( this.cache ) ) {
 			if( this.cache[ id ] ) {
 				const [ ts ] = this.cache[ id ];
 				if( ( now - ts ) > this.timeout ) {
@@ -37,17 +37,15 @@ export class RequestCache {
 		this.cache[ id ] = [ this.getTimestamp(), request ];
 		return id;
 	}
-	get( id, terms ) {
-		this.validate();
+	_get( id ) {
 		if( this.cache[ id ] ) {
 			return this.cache[ id ][ 1 ];
 		}
-		if( terms ) {
-			const request = this.get( this.getId( terms ) );
-			if( request ) {
-				return request;
-			}
-		}
 		return null;
+	}
+	get( id, terms ) {
+		this.validate();
+		return this._get( id ) ||
+			( terms ? this._get( this.getId( terms ) ) : null );
 	}
 }

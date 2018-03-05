@@ -5,11 +5,16 @@ import PropTypes from 'prop-types';
 import jss from 'react-jss';
 import cx from 'classnames';
 
+import _ from 'lodash';
+
 
 @jss( () => ( {
 	commas: {
 		'& > .comma': {
 			cursor: 'default',
+		},
+		'& > *[data-no-comma] + .comma, & > .comma:last-child': {
+			display: 'none',
 		},
 	},
 } ) )
@@ -24,15 +29,18 @@ export class WithCommas extends React.PureComponent {
 	}
 
 	render() {
-		const { className, style, classes, children } = this.props;
+		const { className, style, classes, children: c } = this.props,
+			children = React.Children.toArray( c );
+		if( children.length <= 0 ) {
+			return null;
+		}
 		return <div className={ cx( classes.commas, className ) } style={ style }>
-			{ React.Children.toArray( children ).reduce( ( out, child, index, { length } ) => {
-				out.push( child );
-				if( index < ( length - 1 ) ) {
-					out.push( <span key={ `comma:${index}` } className="comma">, </span> );
-				}
-				return out;
-			}, [] ) }
+			{ _( children )
+				.map( ( child, index ) =>
+					[ child, <span key={ `comma:${index}` } className="comma">, </span> ] )
+				.flatten()
+				.filter()
+				.value() }
 		</div>;
 	}
 }

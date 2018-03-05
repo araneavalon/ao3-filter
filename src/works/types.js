@@ -7,7 +7,7 @@ const workShape = {
 	site: PropTypes.oneOf( [ 'www.fanfiction.net', 'archiveofourown.org' ] ),
 	id: PropTypes.number.isRequired,
 	title: PropTypes.string.isRequired,
-	authors: PropTypes.arrayOf( PropTypes.tuple( [ PropTypes.string.isRequired, PropTypes.string.isRequired ] ).isRequired ).isRequired,
+	authors: PropTypes.arrayOf( PropTypes.tuple( [ PropTypes.string.isRequired, PropTypes.string.isRequired, PropTypes.string ] ).isRequired ).isRequired,
 	summary: PropTypes.string.isRequired,
 	language: PropTypes.string.isRequired,
 	rating: PropTypes.oneOf( [ 'General', 'Teen', 'Mature', 'Explicit', 'Unrated' ] ).isRequired,

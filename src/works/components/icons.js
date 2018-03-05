@@ -10,7 +10,7 @@ import * as Types from '../types';
 
 
 @jss( () => ( {
-	'icon': {
+	icon: {
 		width: '40px',
 		height: '40px',
 		flexShrink: 0,
@@ -19,8 +19,8 @@ import * as Types from '../types';
 
 		position: 'relative',
 		display: 'flex',
-		justifyContent: 'space-around',
 		alignItems: 'center',
+		justifyContent: 'space-around',
 
 		'&:nth-child(odd)': {
 			marginRight: '5px',
@@ -28,16 +28,17 @@ import * as Types from '../types';
 		'&:nth-child(3), &:nth-child(4)': {
 			marginTop: '5px',
 		},
-	},
-	hidden: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		maxWidth: '100%',
-		fontSize: '8px',
-		color: 'transparent',
-		cursor: 'default',
-		wordWrap: 'break-word',
+
+		'& .hidden': {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			maxWidth: '100%',
+			fontSize: '8px',
+			color: 'transparent',
+			cursor: 'default',
+			wordWrap: 'break-word',
+		},
 	},
 } ) )
 export class WorkIcon extends React.PureComponent {
@@ -54,7 +55,6 @@ export class WorkIcon extends React.PureComponent {
 		const { className, title, classes, children } = this.props;
 		return <div className={ cx( classes.icon, className ) } title={ title }>
 			{ children }
-			<span className={ classes.hidden }>{ title }</span>
 		</div>;
 	}
 }
@@ -95,6 +95,7 @@ export class Rating extends React.PureComponent {
 			text = ( rating !== 'Unrated' ) ? rating.slice( 0, 1 ) : '';
 		return <WorkIcon className={ classes[ rating ] } title={ rating }>
 			<span className={ classes.rating }>{ text }</span>
+			<span className="hidden">Rating: { rating }</span>
 		</WorkIcon>;
 	}
 }
@@ -149,6 +150,7 @@ export class Category extends React.PureComponent {
 			title = categories.join( ', ' ) || 'Unknown';
 		return <WorkIcon className={ classes[ className ] } title={ title }>
 			{ this.renderIcon( className ) }
+			<span className="hidden">Categor{ ( className === 'Multi' ) ? 'ies' : 'y' }: { title }</span>
 		</WorkIcon>;
 	}
 }
@@ -176,6 +178,7 @@ export class Site extends React.PureComponent {
 				<Icon set="av" icon="ff-net" /> }
 			{ site === 'archiveofourown.org' &&
 				<Icon set="av" size="xs" icon="ao3" /> }
+			<span className="hidden">Site: { site }</span>
 		</WorkIcon>;
 	}
 }
@@ -200,13 +203,13 @@ export class Length extends React.PureComponent {
 		const { chapters, classes } = this.props,
 			isComplete = chapters[ 0 ] === chapters[ 1 ],
 			isOneShot = isComplete && chapters[ 0 ] === 1,
-			title = isOneShot ? 'One-Shot' : isComplete ? 'Complete' : 'Multi-Chapter';
-		// TODO ICON
+			title = isOneShot ? 'One-Shot' : isComplete ? 'Complete' : 'Incomplete';
 		return <WorkIcon className={ classes[ isComplete ] } title={ title }>
 			{ !isComplete &&
 				<Icon set="solid" icon="ban" /> }
 			{ isComplete &&
 				<Icon set="solid" icon="check" /> }
+			<span className="hidden">Length: { title }</span>
 		</WorkIcon>;
 	}
 }
