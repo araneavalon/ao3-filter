@@ -25,6 +25,10 @@ import cx from 'classnames';
 		'&:active': {
 			backgroundColor: $.backgroundColor.active,
 		},
+
+		'&.disabled': {
+			
+		},
 	}
 } ) )
 export class Button extends React.PureComponent {
@@ -41,9 +45,9 @@ export class Button extends React.PureComponent {
 	render() {
 		const { classes, className, style, disabled, onClick, children } = this.props;
 		return <div
-			className={ cx( classes.button, className ) }
+			className={ cx( classes.button, { disabled }, className ) }
 			style={ style }
-			onClick={ !disabled && onClick }
+			onClick={ disabled ? null : onClick }
 		>{ children }</div>;
 	}
 }

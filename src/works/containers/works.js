@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import jss from 'react-jss';
+import autobind from 'autobind-decorator';
 import { connect } from 'react-redux';
 
 import {
@@ -12,11 +12,9 @@ import {
 import * as Types from '../types';
 
 import { WorkList } from '../components/list';
+import { Pages } from '../components/pages';
 
 
-@jss( {
-
-} )
 @connect(
 	( { works: { page, request_id, loading, list } } ) => ( {
 		page,
@@ -40,21 +38,29 @@ export class Works extends React.Component {
 		loading: PropTypes.bool,
 		page: PropTypes.number.isRequired,
 		works: Types.works.isRequired,
-		classes: PropTypes.object.isRequired,
 	}
 
 	componentDidMount() {
 		const { getWorks, page } = this.props;
+		window.scrollTo( window.scrollX, 0 );
 		getWorks( page );
 	}
 
+	@autobind
+	getPage( page ) {
+		window.scrollTo( window.scrollX, 0 );
+		this.props.getWorks( page );
+	}
+
 	render() {
-		const { loading, works } = this.props;
+		const { loading, page, works } = this.props;
 		return <div>
+			<Pages page={ page } onChange={ this.getPage } />
 			{ loading &&
 				<div>Loading!</div> }
 			{ !loading &&
 				<WorkList works={ works } /> }
+			<Pages page={ page } onChange={ this.getPage } />
 		</div>;
 	}
 }

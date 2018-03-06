@@ -17,7 +17,7 @@ export class Ao3Query extends Query {
 		}
 		return [
 			( fuzzy || !not() ) &&
-				( { work_search: { query: not( `"${value}"` ) } } ),
+				( { work_search: { query: not( `title:"${value}"` ) } } ),
 			!fuzzy &&
 				( ( work ) => not( work.title === value ) )
 		];
@@ -28,7 +28,7 @@ export class Ao3Query extends Query {
 		}
 		return [
 			( fuzzy || !not() ) &&
-				( { work_search: { query: not( `"${value}"` ) } } ),
+				( { work_search: { query: not( `creator:"${value}"` ) } } ),
 			!fuzzy &&
 				( ( work ) => not( work.authors.find( ( [ author ] ) => author === value ) != null ) )
 		];

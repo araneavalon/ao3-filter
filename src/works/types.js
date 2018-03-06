@@ -12,7 +12,7 @@ const workShape = {
 	language: PropTypes.string.isRequired,
 	rating: PropTypes.oneOf( [ 'General', 'Teen', 'Mature', 'Explicit', 'Unrated' ] ).isRequired,
 	updated: PropTypes.number.isRequired,
-	published: PropTypes.number.isRequired,
+	published: PropTypes.number,
 	chapters: PropTypes.tuple( [ PropTypes.number.isRequired, PropTypes.number ] ).isRequired,
 	words: PropTypes.number.isRequired,
 	hits: PropTypes.number,
