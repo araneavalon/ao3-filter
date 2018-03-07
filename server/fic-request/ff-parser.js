@@ -84,7 +84,7 @@ export class _FFParser extends Parser {
 				work.language = s;
 			} else if( i === 2 ) {
 				const genres = s.replace( 'Hurt/Comfort', '_HC_' ).split( '/' ).map( ( genre ) => genre.replace( '_HC_', 'Hurt/Comfort' ) );
-				work.tags.push( ...genres.map( ( genre ) => ( { type: 'genre', name: genre } ) ) );
+				work.tags.push( ...genres.map( ( genre ) => ( { type: 'freeform', name: genre } ) ) );
 			} else if( i === ( l - 1 ) || i === ( l - 2 ) ) {
 				const _c = s.split( /[\[\],]/g ).map( ( v ) => v.trim() ).filter( ( v ) => v ).sort(),
 					c = this.fixCharacters( _c );

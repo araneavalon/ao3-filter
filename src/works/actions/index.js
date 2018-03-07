@@ -10,6 +10,7 @@ const TERMS = [].concat(
 		'Damien_Kova',
 		'doomzoom',
 		'Fallen_Shadow69',
+		'Fallen Shadow69',
 		'FireGire96',
 		'IndieCent',
 		'Izissia',

@@ -1,0 +1,37 @@
+{
+	"tag": [ {
+		"type": "warning",
+		"ao3": "<Number?>",
+		"name": [
+			"No Archive Warnings Apply",
+			"Graphic Depictions of Violence",
+			"Major Character Death",
+			"Rape/Non-con",
+			"Underage"
+			"Creator Chose Not To Use Archive Warnings",
+		],
+	}, {
+		"type": "relationship",
+		"ao3": "<Number?>",
+		"name": "<String?>",
+		"characters": "<String[]>",
+		"ships": "<String[]>",
+	}, {
+		"type": "character",
+		"name": "<String>",
+		"disabled": "<Boolean>",
+		"display": "<String?>",
+		"ao3": "<String?>",
+		"ff": "<String?>",
+	}, {
+		"type": [ "fandom", "freeform" ],
+		"category": "<String?>",
+		"name": "<String>",
+	} ],
+	"work": {
+		"ao3": "<Number?>",
+		"ff": "<Number?>",
+		"site": [ "ao3", "ff" ],
+		"tags": "<String[]>",
+	},
+}
