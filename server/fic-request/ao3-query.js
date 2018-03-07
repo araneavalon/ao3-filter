@@ -74,14 +74,20 @@ export class Ao3Query extends Query {
 	parseWarning( term ) {
 		return this.parseTag( term );
 	}
-	parseRelationship( { not, exact, characters } ) {
+	parseRelationship( term ) {
 		// 	TODO
 		// 		Implement fuzzy
 		// 		Implement qs filtering when available.
-		return ( work ) => not( work.tags
-			.filter( ( { type } ) => type === 'relationship' )
-			.some( ( { characters: c } ) =>
-				( exact ? _.xor : _.difference )( characters, c ).length <= 0 ) );
+		const { not, exact, id, characters } = term;
+		if( exact && id != null ) {
+			return this.parseTag( term );
+		} else if( characters ) {
+			return ( work ) => not( work.tags
+				.filter( ( { type } ) => type === 'relationship' )
+				.some( ( { characters: c } ) =>
+					( exact ? _.xor : _.difference )( characters, c ).length <= 0 ) );
+		}
+		return null;
 	}
 	parseCharacter( { not, exact, name } ) {
 		// 	TODO
@@ -89,14 +95,16 @@ export class Ao3Query extends Query {
 		// 		Implement qs filtering when available.
 		return ( work ) => {
 			const characters = [].concat(
-				!exact ?
-					work.tags
-						.filter( ( { type } ) => type === 'character' )
-						.map( ( { name } ) => name ) :
-					[],
 				work.tags
-					.filter( ( { type } ) => type == 'relationship' )
-					.reduce( ( o, { characters } ) => o.concat( characters ), [] )
+					.filter( ( { type } ) => type === 'character' )
+					.map( ( { name } ) => name ),
+				!exact ?
+					_( work.tags )
+						.filter( ( { type } ) => type === 'relationship' )
+						.map( ( { characters } ) => characters )
+						.flatten()
+						.value() :
+					[]
 			);
 			return not( characters.includes( name ) );
 		}

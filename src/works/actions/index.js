@@ -27,7 +27,8 @@ const TERMS = [].concat(
 		{ type: 'tag', not: true, exact: true, name: 'Parent/Child Incest' },
 		{ type: 'relationship', not: true, characters: [ 'Ruby Rose', 'Jaune Arc' ] },
 		{ type: 'relationship', not: true, characters: [ 'Weiss Schnee', 'Jaune Arc' ] },
-		{ type: 'tag', not: true, exact: true, name: 'Cheating' },
+		{ type: 'relationship', not: true, id: 17359695 }, // Jaune Arc/Other(s)
+		{ type: 'tag', not: true, exact: true, id: 25331, name: 'Cheating' },
 	]
 );
 
