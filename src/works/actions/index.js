@@ -17,18 +17,20 @@ const TERMS = [].concat(
 		'Lucky-38',
 		'ObsidianThorne',
 		'RWBYRemnants',
+		'SergeantLawson',
 		'VellanShadow',
 		'WestOrEast'
 	].map( ( author ) => ( { type: 'author', not: true, value: author } ) ),
 	[
-		{ type: 'title', not: true, value: 'The Great Overlord Ozpin' },
-		{ type: 'title', not: true, value: 'Tormenter' },
+		{ type: 'series', not: true, id: 926118 },
+		{ type: 'id', not: true, ao3: 12531572 },
+		{ type: 'id', not: true, ao3: 10435569 },
 		{ type: 'relationship', not: true, characters: [ 'Tyrian Callows' ] },
-		{ type: 'tag', not: true, exact: true, name: 'Parent/Child Incest' },
+		{ type: 'freeform', not: true, exact: true, name: 'Parent/Child Incest' },
 		{ type: 'relationship', not: true, characters: [ 'Ruby Rose', 'Jaune Arc' ] },
 		{ type: 'relationship', not: true, characters: [ 'Weiss Schnee', 'Jaune Arc' ] },
-		{ type: 'relationship', not: true, id: 17359695 }, // Jaune Arc/Other(s)
-		{ type: 'tag', not: true, exact: true, id: 25331, name: 'Cheating' },
+		{ type: 'relationship', not: true, exact: true, id: 17359695 }, // Jaune Arc/Other(s)
+		{ type: 'freeform', not: true, exact: true, id: 25331, name: 'Cheating' },
 	]
 );
 
@@ -43,7 +45,7 @@ TERMS.push(
 			[ 'Coco Adel', 'Velvet Scarlatina' ],
 		]
 	},
-	{ type: 'relationship', characters: [ 'Ruby Rose' ] },
+	// { type: 'relationship', characters: [ 'Ruby Rose' ] },
 	{ type: 'relationship', not: true, characters: [ 'Jaune Arc' ] },
 );
 
@@ -54,7 +56,7 @@ export const GET_WORKS_REQUEST = `${__filename}:GET_WORKS_REQUEST`;
 export const GET_WORKS_RESPONSE = `${__filename}:GET_WORKS_RESPONSE`;
 export const getWorks = ( page, request_id ) => ( dispatch ) => {
 	dispatch( { type: GET_WORKS_REQUEST, request_id, page } );
-	return fetch.get( `/works/all/page/${page}`, { request_id, terms: JSON.stringify( TERMS ) } )
+	return fetch.get( `/works/all/page/${page}`, { request_id, terms: JSON.stringify( TERMS ) }, { credentials: 'same-origin' } )
 		.then( ( response ) => response.json() )
 		.then( ( { request_id, works } ) => {
 			dispatch( { type: GET_WORKS_RESPONSE, request_id, page, works } );

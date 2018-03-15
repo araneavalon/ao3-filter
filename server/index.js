@@ -1,6 +1,7 @@
 'use strict';
 
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 
 import { getDatabase } from 'db';
@@ -18,6 +19,7 @@ app.get( '/index.html', ( req, res ) => {
 app.use( '/static', express.static( path.resolve( __dirname, '../../', 'static' ), { index: false } ) );
 app.use( '/build', express.static( path.resolve( __dirname, '../../', 'build/src' ), { index: false } ) );
 
+app.use( '/', cookieParser() );
 app.use( '/', ( req, res, next ) =>
 	getDatabase()
 		.then( ( db ) => ( req.db = db ) )

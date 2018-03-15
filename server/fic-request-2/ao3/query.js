@@ -1,28 +1,13 @@
 'use strict';
 
-import _ from 'lodash';
 import request from 'request-promise-native';
-import { Query } from './query';
+import _ from 'lodash';
+
+import { createSessionCookies } from './cookies';
+import { Query } from 'fic-request-2/query';
 
 
 export class Ao3Query extends Query {
-	constructor( terms, options ) {
-		super( terms, options );
-
-		if( this.options.ao3Session != null ) {
-			const jar = request.jar();
-			_.forEach(
-				this.options.ao3Session,
-				( { key, value } ) =>
-					jar.setCookie(
-						`${key}=${encodeURIComponent( value )}`,
-						'https://archiveofourown.org' ) );
-			this.jar = jar;
-		} else {
-			this.jar = null;
-		}
-	}
-
 	getTagKey( type ) {
 		return ( type.length < 6 ) ?
 			`${type.toLowerCase()}_ids` :
@@ -154,27 +139,29 @@ export class Ao3Query extends Query {
 				relationships.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
 	}
 
-	page( page ) {
-		return {
+	afterParse() {
+		this.qs = _.mergeWith( {
+			tag_id: 'RWBY',
+			work_search: {
+				sort_column: 'revised_at',
+			},
+		}, ...this.qs, ( a, b ) => {
+			if( _.isArray( a ) ) {
+				return a.concat( b );
+			} else if( _.isString( a ) ) {
+				return a + ' ' + b;
+			}
+			return undefined;
+		} );
+	}
+
+	request( page, credentials ) {
+		return request( {
 			method: 'GET',
 			url: 'https://archiveofourown.org/works',
-			jar: this.jar,
+			jar: createSessionCookies( credentials ),
 			qsStringifyOptions: { format: 'RFC1738' },
-			qs: _.mergeWith( {
-				page,
-				utf8: '✓',
-				tag_id: 'RWBY',
-				work_search: {
-					sort_column: 'revised_at',
-				},
-			}, ...this.qs, ( a, b ) => {
-				if( _.isArray( a ) ) {
-					return a.concat( b );
-				} else if( _.isString( a ) ) {
-					return a + ' ' + b;
-				}
-				return undefined;
-			} )
-		};
+			qs: { page, ...this.qs }
+		} );
 	}
 }

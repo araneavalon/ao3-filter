@@ -1,16 +1,20 @@
 'use strict';
 
 import { Router } from 'express';
-import { Ao3Request, FFRequest, CombinedRequest, RequestCache } from 'fic-request';
+import { Request } from 'fic-request-2';
+import { Ao3Query, ao3Parser } from 'fic-request-2/ao3';
+import { FFQuery, ffParser } from 'fic-request-2/ff';
 
-const SITES = {
-	all: CombinedRequest,
-	ao3: Ao3Request,
-	ff: FFRequest,
-};
 
 const route = new Router();
-const cache = new RequestCache();
+
+const ao3 = { key: 'ao3', getQuery: Ao3Query.getQueryFactory(), parseWorks: ao3Parser.parseWorks };
+const ff = { key: 'ff', getQuery: FFQuery.getQueryFactory(), parseWorks: ffParser.parseWorks };
+const SITES = {
+	all: new Request( [ ao3, ff ] ),
+	ao3: new Request( [ ao3 ] ),
+	ff: new Request( [ ff ] ),
+};
 
 
 route.use( '/', ( req, res, next ) => {
@@ -20,29 +24,14 @@ route.use( '/', ( req, res, next ) => {
 	next();
 } );
 
-route.get( '/:site/page/:page', ( req, res ) => {
-	const { site, page } = req.params,
-		{ terms } = req.query;
+route.get( '/:site/page/:page', ( req, res ) => { // TODO REMOVE :site
+	const { page, site } = req.params,
+		{ terms } = req.query,
+		credentials = { ao3: req.cookies[ 'ao3-session' ] };
 
-	let request_id = req.query.request_id,
-		request = null;
-
-	if( request_id != null ) {
-		request = cache.get( request_id, terms );
-	}
-	if( request == null ) {
-		if( SITES[ site ] != null ) {
-			request = new SITES[ site ]( terms );
-		} else {
-			res.status( 400 ).json( { error: `Invalid site "${site}".` } );
-			return;
-		}
-		request_id = cache.add( request );
-	}
-
-	request.page( page )
+	SITES[ site ].page( page, terms, credentials )
 		.then( ( works ) => {
-			res.status( 200 ).json( { request_id, works } );
+			res.status( 200 ).json( { works } );
 		} )
 		.catch( ( error ) => {
 			console.error( error );

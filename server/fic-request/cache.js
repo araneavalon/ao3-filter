@@ -13,8 +13,11 @@ export class RequestCache {
 		this.cache = Object.create( null );
 	}
 
-	getId( terms ) {
-		return crypto.createHash( 'md5' ).update( JSON.stringify( terms ) ).digest( 'hex' );
+	getId( { terms, options } ) {
+		return crypto.createHash( 'md5' )
+			.update( JSON.stringify( terms ) )
+			.update( JSON.stringify( options ) )
+			.digest( 'hex' );
 	}
 	getTimestamp() {
 		return Date.now() / 1000 | 0;
@@ -33,7 +36,7 @@ export class RequestCache {
 	}
 
 	add( request ) {
-		const id = this.getId( request.terms );
+		const id = this.getId( request );
 		this.cache[ id ] = [ this.getTimestamp(), request ];
 		return id;
 	}
@@ -43,9 +46,9 @@ export class RequestCache {
 		}
 		return null;
 	}
-	get( id, terms ) {
+	get( id, terms, options ) {
 		this.validate();
 		return this._get( id ) ||
-			( terms ? this._get( this.getId( terms ) ) : null );
+			( terms ? this._get( this.getId( { terms, options } ) ) : null );
 	}
 }

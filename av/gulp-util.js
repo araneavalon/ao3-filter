@@ -2,6 +2,7 @@
 
 import gutil from 'gulp-util';
 import through from 'through2';
+import mergeStream from 'merge-stream';
 
 
 const _callIfFunction = ( value ) => {
@@ -12,7 +13,7 @@ const _callIfFunction = ( value ) => {
 }
 
 export const avGulpUtil = {
-	sequence( src, dest ) {
+	sequenceStreams( src, dest ) {
 		const t = through.obj();
 
 		let done = false;
@@ -34,6 +35,10 @@ export const avGulpUtil = {
 			.on( 'finish', next );
 
 		return t;
+	},
+
+	allStreams( streams ) {
+		return mergeStream( ...streams );
 	}
 };
 

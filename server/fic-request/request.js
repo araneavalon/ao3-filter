@@ -8,19 +8,24 @@ export class Request {
 	static PAGE_SIZE = 25;
 
 	constructor( Query, Parser, terms, options = {} ) {
-		this.Query = Query.parseTerms( terms );
-		this.Parser = Parser;
 		this.terms = terms;
 
+		this.options = options;
+		this.queryOptions = ( options.queryOptions != null ) ? options.queryOptions : {};
 		this.maxTries = ( options.maxTries != null ) ? options.maxTries : Request.MAX_TRIES;
 		this.pageSize = ( options.pageSize != null ) ? options.pageSize : Request.PAGE_SIZE;
+
+		this.Query = new Query( this.terms, this.queryOptions );
+		this.Parser = Parser;
 
 		this.rawPage = 1;
 		this.cache = [];
 	}
 
 	request( page = 1 ) {
-		return request( this.Query.page( page ) )
+		const opts = this.Query.page( page );
+		console.log( this.constructor.name, opts.qs );
+		return request( opts )
 			.then( ( body ) => this.Parser.works( body ) );
 	}
 
@@ -39,6 +44,7 @@ export class Request {
 			.then( ( works ) => this.Query.filter( works ) )
 			.then( ( works ) => {
 				this.cache = this.cache.concat( works );
+				console.log( works.length, this.cache.length );
 				return works.length <= 0;
 			} )
 			.then( ( none ) => this.fillCache( min, none ? ( tries + 1 ) : 0 ) );

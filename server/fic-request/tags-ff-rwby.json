@@ -1,7 +1,4 @@
-'use strict';
-
-// Because babel is being a butt and not letting me import json.
-export default [
+[
   {
     "name": "A. Watts",
     "ff-id": 143029,

@@ -29,6 +29,7 @@ const options = {
 		return {
 			root: './server',
 			src: 'server/**/*.js',
+			json: 'server/**/*.json',
 			dest: 'build/server',
 		};
 	},
@@ -139,12 +140,15 @@ gulp.task( '-build:vendor', () => {
 		.pipe( gulp.dest( options.vendor.dest ) );
 } );
 gulp.task( '-build:server', () => {
-	return gulp.src( options.server.src )
-		.pipe( babel( {
-			plugins: [ [ 'module-resolver', {
-				root: options.server.root
-			} ] ]
-		} ) )
+	return gutil.allStreams( [
+		gulp.src( options.server.src )
+			.pipe( babel( {
+				plugins: [ [ 'module-resolver', {
+					root: options.server.root
+				} ] ]
+			} ) ),
+		gulp.src( options.server.json ),
+	] )
 		.pipe( gulp.dest( options.server.dest ) );
 } );
 
@@ -156,7 +160,7 @@ gulp.task( '-start:server', ( cb ) => {
 
 gulp.task( '-watch:app', () => {
 	const b = watchify( browserify( options.watchify ) ),
-		lintAndBundle = () => gutil.sequence( _lint( options.app.src, false ), _makeBundle( b ) );
+		lintAndBundle = () => gutil.sequenceStreams( _lint( options.app.src, false ), _makeBundle( b ) );
 	b.on( 'update', lintAndBundle );
 	b.on( 'log', gutil.log );
 	lintAndBundle();

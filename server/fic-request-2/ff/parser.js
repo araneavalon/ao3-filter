@@ -3,7 +3,7 @@
 import cheerio from 'cheerio';
 import _ from 'lodash';
 
-import { Parser } from './parser';
+import { Parser } from 'fic-request-2/parser';
 
 import characters from './tags-ff-rwby.json';
 
@@ -11,7 +11,7 @@ import characters from './tags-ff-rwby.json';
 const _parseNumber = ( v ) => Number( v.replace( ',', '' ) ),
 	_parseString = ( v ) => String( v );
 
-export class _FFParser extends Parser {
+export class FFParser extends Parser {
 	static get DEFAULT_WORK() {
 		return Object.assign( super.DEFAULT_WORK, {
 			site: 'www.fanfiction.net',
@@ -29,7 +29,7 @@ export class _FFParser extends Parser {
 		'M': 'Mature',
 	};
 	static WORK_STAT_FORMATTERS = {
-		Rated: [ 'rating', ( v ) => _FFParser.RATINGS[ _parseString( v ) ] ],
+		Rated: [ 'rating', ( v ) => FFParser.RATINGS[ _parseString( v ) ] ],
 		Chapters: [ 'chapters', ( v ) => [ _parseNumber( v ), null ] ],
 		Words: [ 'words', _parseNumber ],
 		Reviews: [ 'comments', _parseNumber ],
@@ -37,7 +37,7 @@ export class _FFParser extends Parser {
 		Follows: [ 'subscriptions', _parseNumber ],
 	};
 
-	works( html ) {
+	parseWorks( html ) {
 		return Promise.resolve( cheerio.load( html ) )
 			.then( ( $ ) =>
 				Array.from( $( '.z-list.zhover.zpointer' ) )
@@ -69,7 +69,7 @@ export class _FFParser extends Parser {
 		statsString.trim().split( ' - ' ).forEach( ( s, i, { length: l } ) => {
 			const m = s.match( /^(\w+?): (.+?)$/ );
 			if( m != null ) {
-				const f = _FFParser.WORK_STAT_FORMATTERS[ m[ 1 ] ];
+				const f = FFParser.WORK_STAT_FORMATTERS[ m[ 1 ] ];
 				if( f != null ) {
 					const [ key, fn ] = f;
 					work[ key ] = fn( m[ 2 ] );
@@ -112,4 +112,4 @@ export class _FFParser extends Parser {
 	}
 }
 
-export const FFParser = new _FFParser();
+export const ffParser = new FFParser();

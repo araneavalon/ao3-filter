@@ -1,7 +1,9 @@
 'use strict';
 
+import request from 'request-promise-native';
 import _ from 'lodash';
-import { Query } from './query';
+
+import { Query } from 'fic-request-2/query';
 
 
 // TODO Add qs filtering, when available.
@@ -40,11 +42,11 @@ export class FFQuery extends Query {
 				relationships.find( ( p ) => _.xor( c, p ).length <= 0 ) == null ) );
 	}
 
-	page( page ) {
-		return {
+	request( page ) {
+		return request( {
 			method: 'GET',
 			uri: 'https://www.fanfiction.net/anime/RWBY/',
 			qs: { p: page, srt: 1, lan: 1, r: 10 },
-		};
+		} );
 	}
 }

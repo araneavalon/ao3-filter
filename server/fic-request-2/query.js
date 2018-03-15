@@ -4,8 +4,13 @@ import _ from 'lodash';
 
 
 export class Query {
+	static getQueryFactory( options ) {
+		return ( terms ) => new this( terms, options );
+	}
+
 	constructor( terms, options = {} ) {
 		this.options = options;
+		this.terms = terms;
 
 		this.parsers = new Proxy( this, {
 			get: ( target, _key ) => {
@@ -19,6 +24,7 @@ export class Query {
 		this.qs = [];
 		this.filters = [];
 
+		this.beforeParse();
 		for( const term of terms ) {
 			const queries = this.parsers[ term.type ]( this.termPreparser( term ) );
 			for( const query of _.isArray( queries ) ? queries : [ queries ] ) {
@@ -29,6 +35,7 @@ export class Query {
 				}
 			}
 		}
+		this.afterParse();
 	}
 
 	termPreparser( term ) {
@@ -49,8 +56,11 @@ export class Query {
 		} } );
 	}
 
-	page() {
-		throw new Error( 'Virtual method Query.page not defined.' );
+	beforeParse() {}
+	afterParse() {}
+
+	request() {
+		return Promise.reject( `${this.constructor.name}.request not implemented.` );
 	}
 	filter( works ) {
 		return works.filter( ( work ) => this.filters.every( ( filter ) => filter( work ) ) );

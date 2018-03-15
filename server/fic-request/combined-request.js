@@ -14,6 +14,7 @@ export class CombinedRequest {
 	constructor( terms, options = {} ) {
 		this.terms = terms;
 
+		this.options = options;
 		this.maxTries = ( options.maxTries != null ) ? options.maxTries : Request.MAX_TRIES;
 		this.pageSize = ( options.pageSize != null ) ? options.pageSize : Request.PAGE_SIZE;
 
