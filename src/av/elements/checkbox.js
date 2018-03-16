@@ -15,8 +15,8 @@ import { Icon } from 'av/react-font-awesome';
 		userSelect: 'none',
 		color: $.colors.lightest,
 
-		'& .true': {},
-		'& .false': {},
+		'&.true': {},
+		'&.false': {},
 	},
 } ) )
 export class Checkbox extends React.PureComponent {
@@ -51,13 +51,22 @@ export class Checkbox extends React.PureComponent {
 
 @jss( ( $ ) => ( {
 	container: {
+		display: 'flex',
 		cursor: 'pointer',
 		userSelect: 'none',
 		color: $.colors.lightest,
 
-		'& .true': {},
-		'& .false': {},
-		'& .null': {},
+		'& > *:first-child': {
+			marginRight: $.margin.small,
+		},
+
+		'& > .true': {},
+		'& > .false': {},
+		'& > .null': {},
+
+		'& > .label': {
+			lineHeight: '1.33333em',
+		}
 	},
 } ) )
 export class TriCheckbox extends React.PureComponent {
@@ -70,6 +79,7 @@ export class TriCheckbox extends React.PureComponent {
 		value: PropTypes.bool,
 		onChange: PropTypes.func.isRequired,
 		classes: PropTypes.object.isRequired,
+		children: PropTypes.node,
 	}
 
 	static defaultProps = {
@@ -99,13 +109,17 @@ export class TriCheckbox extends React.PureComponent {
 	}
 
 	render() {
-		const{ style, className, classes, value } = this.props,
+		const{ style, className, classes, value, children } = this.props,
 			icon = this.getIcon( value );
 		return <div
-			key={ value }
-			className={ cx( classes.container, String( value ), className ) }
+			className={ cx( classes.container, className ) }
 			style={ style }
 			onClick={ this.onClick }
-		><Icon set="regular" size="lg" icon={ icon } /></div>;
+		>
+			<Icon dynamic={ value } className={ String( value ) } set="regular" size="lg" icon={ icon } />
+			<div className="label">
+				{ children }
+			</div>
+		</div>;
 	}
 }

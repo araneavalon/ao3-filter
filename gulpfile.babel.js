@@ -76,7 +76,11 @@ const _makeBundle = ( b ) => {
 		.transform( babelify );
 	return () => {
 		return b.bundle()
-			.on( 'error', ( { message, stack } ) => gutil.log( 'Browserify Error', message, stack ) )
+			.on( 'error', ( { message, stack } ) => {
+				if( message !== 'write after end' ) {
+					gutil.log( 'Browserify Error:\n', stack );
+				}
+			} )
 			.pipe( source( options.app.file ) )
 			.pipe( buffer() )
 			.pipe( production( uglify() ) )

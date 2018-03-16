@@ -17,7 +17,7 @@ import { Works } from 'works';
 	container: {
 		...$.page,
 		minHeight: '100%',
-		padding: [ '48px', '35%', '48px', '35%' ],
+		padding: [ '48px', '20%', '48px', '35%' ],
 	},
 	header: {
 		display: 'flex',
@@ -30,6 +30,18 @@ import { Works } from 'works';
 	},
 
 	'@global': {
+		'ul, ol, li, button, dl, dt, dd, div, span, a': {
+			border: 0,
+			outline: 0,
+			fontWeight: 'inherit',
+			fontStyle: 'inherit',
+			fontSize: '100%',
+			fontFamily: 'inherit',
+			verticalAlign: 'baseline',
+			listStyle: 'none',
+			margin: 0,
+			padding: 0,
+		},
 		'.landmark': {
 			fontSize: 0,
 			lineHeight: 0,
@@ -57,8 +69,8 @@ export class App extends React.Component {
 		const { classes, page, setPage } = this.props;
 		return <div className={ classes.container }>
 			<div className={ classes.header }>
-				<Button onClick={ setPage.bind( null, 'works' ) }>Works</Button>
-				<Button onClick={ setPage.bind( null, 'searches' ) }>Searches</Button>
+				<Button selected={ page === 'works' } onClick={ setPage.bind( null, 'works' ) }>Works</Button>
+				<Button selected={ page === 'searches' } onClick={ setPage.bind( null, 'searches' ) }>Searches</Button>
 			</div>
 			<div className={ classes.content }>
 				{ page === 'searches' &&

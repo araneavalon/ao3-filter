@@ -138,8 +138,7 @@ export class Work extends React.Component {
 				</div>
 				<div className="required-tags">
 					<Rating rating={ work.rating } />
-					<Category categories={ work.tags.filter( ( { type } ) => type === 'category' ).map( ( { name } ) => name )
-						.concat( work.site === 'www.fanfiction.net' ? [ 'ff-net' ] : [] ) } />
+					<Category categories={ work.tags.filter( ( { type } ) => type === 'category' ).map( ( { name } ) => name ) } />
 					<Site site={ work.site } />
 					<Length chapters={ work.chapters } />
 				</div>

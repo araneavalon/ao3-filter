@@ -26,8 +26,15 @@ import cx from 'classnames';
 			backgroundColor: $.backgroundColor.active,
 		},
 
-		'&.disabled': {
-			
+		'&.selected': {
+			backgroundColor: $.colors.darker,
+			borderColor: $.colors.darkest,
+		},
+		'&.disabled:not(.selected)': {
+			cursor: 'default',
+			backgroundColor: $.colors.mid,
+			borderColor: $.colors.light,
+			color: $.colors.lighter,
 		},
 	}
 } ) )
@@ -37,15 +44,17 @@ export class Button extends React.PureComponent {
 	static propTypes = {
 		style: PropTypes.object,
 		className: PropTypes.string,
+		selected: PropTypes.bool,
 		disabled: PropTypes.bool,
 		onClick: PropTypes.func,
-		classes: PropTypes.object.isRequired
+		classes: PropTypes.object.isRequired,
+		children: PropTypes.node.isRequired,
 	}
 
 	render() {
-		const { classes, className, style, disabled, onClick, children } = this.props;
+		const { classes, className, style, selected, disabled, onClick, children } = this.props;
 		return <div
-			className={ cx( classes.button, { disabled }, className ) }
+			className={ cx( classes.button, { selected, disabled }, className ) }
 			style={ style }
 			onClick={ disabled ? null : onClick }
 		>{ children }</div>;

@@ -122,9 +122,6 @@ export class Rating extends React.PureComponent {
 	Unknown: {
 		backgroundColor: 'white',
 	},
-	'ff-net': { // TODO FIGURE THIS OUT AND REMOVE
-		backgroundColor: $.colors.ffBlue
-	}
 } ) )
 export class Category extends React.PureComponent {
 	static displayName = __filename +  ':Category';

@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import autobind from 'autobind-decorator';
+import jss from 'react-jss';
 import { connect } from 'react-redux';
 
 import {
@@ -13,24 +14,40 @@ import * as Types from '../types';
 
 import { WorkList } from '../components/list';
 import { Pages } from '../components/pages';
+import { FilterSidebar } from 'filter';
 
 
 @connect(
-	( { works: { page, request_id, loading, list } } ) => ( {
+	( { works: { page, loading, list }, filters: { terms } } ) => ( {
 		page,
-		request_id,
 		loading,
-		works: list
+		works: list,
+		terms,
 	} ),
 	( dispatch ) => ( {
-		getWorks: ( page, request_id ) => dispatch( getWorks( page, request_id ) )
+		getWorks: ( page, terms ) => dispatch( getWorks( page, terms ) )
 	} ),
-	( s, { getWorks }, p ) => ( {
+	( { terms, ...s }, { getWorks, ...a }, p ) => ( {
 		...s,
+		...a,
 		...p,
-		getWorks: ( page ) => getWorks( page, s.request_id ),
+		getWorks: ( page ) => getWorks( page, terms ),
 	} )
 )
+@jss( () => ( {
+	works: {
+		display: 'flex',
+	},
+	list: {
+		width: '66%',
+	},
+	sidebar: {
+		width: '33%',
+		height: '100px',
+		marginTop: 'calc( 40px + .643em )',
+		padding: [ '.429em', '.75em' ],
+	},
+} ) )
 export class Works extends React.Component {
 	static displayName = __filename;
 
@@ -38,6 +55,8 @@ export class Works extends React.Component {
 		loading: PropTypes.bool,
 		page: PropTypes.number.isRequired,
 		works: Types.works.isRequired,
+		getWorks: PropTypes.func.isRequired,
+		classes: PropTypes.object.isRequired,
 	}
 
 	componentDidMount() {
@@ -53,14 +72,19 @@ export class Works extends React.Component {
 	}
 
 	render() {
-		const { loading, page, works } = this.props;
-		return <div>
-			<Pages page={ page } onChange={ this.getPage } />
-			{ loading &&
-				<div>Loading!</div> }
-			{ !loading &&
-				<WorkList works={ works } /> }
-			<Pages page={ page } onChange={ this.getPage } />
+		const { loading, page, works, classes } = this.props;
+		return <div className={ classes.works }>
+			<div className={ classes.list }>
+				<Pages page={ page } onChange={ this.getPage } />
+				{ loading &&
+					<div>Loading!</div> }
+				{ !loading &&
+					<WorkList works={ works } /> }
+				<Pages page={ page } onChange={ this.getPage } />
+			</div>
+			<div className={ classes.sidebar }>
+				<FilterSidebar />
+			</div>
 		</div>;
 	}
 }

@@ -24,6 +24,7 @@ export class Icon extends React.Component {
 		set: PropTypes.oneOf( [ 'av', 'regular', 'solid', 'light' ] ).isRequired,
 		icon: PropTypes.string.isRequired,
 		className: PropTypes.string,
+		dynamic: PropTypes.any,
 		fixedWidth: PropTypes.bool,
 		size: PropTypes.oneOf( [ 'xs', 'sm', 'lg', '2x', '3x', '4x', '5x', '6x', '7x', '8x', '9x', '10x' ] ),
 		border: PropTypes.bool,
@@ -46,6 +47,7 @@ export class Icon extends React.Component {
 			set,
 			icon,
 			className,
+			dynamic,
 			fixedWidth,
 			size,
 			border,
@@ -57,7 +59,7 @@ export class Icon extends React.Component {
 			...props
 		} = this.props;
 
-		const classNames = cx( [
+		const faClassNames = cx( [
 			SETS[ set ],
 			'fa-' + icon,
 			fixedWidth && 'fa-fw',
@@ -65,18 +67,19 @@ export class Icon extends React.Component {
 			border && 'fa-border',
 			pull && 'fa-pull-' + pull,
 			spin && 'fa-spin',
-			pulse && 'fa-pulse',
-			className
+			pulse && 'fa-pulse'
 		] );
 
 		const dataFaTransform = Array.isArray( transform ) ?
 			transform.join( ' ' ) :
 			transform;
 
-		return <i
-			className={ classNames }
-			title={ title }
-			data-fa-transform={ dataFaTransform }
-			{ ...props } />;
+		return <span key={ dynamic } className={ className }>
+			<i
+				className={ faClassNames }
+				title={ title }
+				data-fa-transform={ dataFaTransform }
+				{ ...props } />
+		</span>;
 	}
 }
