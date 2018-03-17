@@ -1,10 +1,12 @@
 'use strict';
 
+const debug = require( 'debug' )( 'fic-request-2:ao3-query' );
 import request from 'request-promise-native';
 import _ from 'lodash';
 
-import { createSessionCookies } from './cookies';
 import { Query } from 'fic-request-2/query';
+import { createSessionCookies } from './cookies';
+import tagNames from './tag-names.json';
 
 
 export class Ao3Query extends Query {
@@ -12,6 +14,18 @@ export class Ao3Query extends Query {
 		return ( type.length < 6 ) ?
 			`${type.toLowerCase()}_ids` :
 			'filter_ids';
+	}
+	getTagName( name ) {
+		const n = tagNames[ name ];
+		return ( n != null ) ? n : name;
+	}
+
+	termPreparser( term ) {
+		// TODO
+		// Don't do this. Preferably add this shit to the fuckin' database?
+		return Object.assign(
+			super.termPreparser( term ),
+			{ name: this.getTagName( term.name ) } );
 	}
 
 	parseId( { not, ao3 } ) {
@@ -43,15 +57,15 @@ export class Ao3Query extends Query {
 				( ( work ) => not( work.authors.find( ( [ author ] ) => author === value ) != null ) )
 		];
 	}
-	parseRating( { not, fuzzy, value } ) {
+	parseRating( { not, fuzzy, name } ) {
 		if( !not() && !fuzzy ) {
-			return { work_search: { other_tag_names: [ value ] } };
+			return { work_search: { other_tag_names: [ name ] } };
 		}
 		return [
 			( fuzzy || !not() ) &&
-				( { work_search: { query: not( `"${value}"` ) } } ),
+				( { work_search: { query: not( `"${name}"` ) } } ),
 			!fuzzy &&
-				( ( work ) => not( work.rating === value ) )
+				( ( work ) => not( work.rating === name ) )
 		];
 	}
 	parseComplete( { not } ) {
@@ -65,6 +79,7 @@ export class Ao3Query extends Query {
 	_parseTag( { not, fuzzy, exact, type, id, name } ) {
 		// 	TODO
 		// 		Implement querystring id filtering, when available.
+		debug( 'ao3Query.parseTag %j', { not: not(), fuzzy, exact, type, id, name } );
 		if( fuzzy ) {
 			return { work_search: { query: not( `"${name}"` ) } };
 		} else if( exact && type != null && id != null ) {
@@ -74,14 +89,18 @@ export class Ao3Query extends Query {
 		} else if( exact && name != null && not() ) {
 			return ( work ) => not( work.tags.find( ( { type: t, name: n } ) => ( type == null || t === type ) && n === name ) != null );
 		} else if( !exact && name != null ) {
-			return ( work ) => not( work.tags.find( ( { type: t, name: n } ) => ( type == null || t === type ) && n.contains( name ) ) );
+			return ( work ) => not( work.tags.find( ( { type: t, name: n } ) => ( type == null || t === type ) && n.includes( name ) ) );
 		}
+		debug( 'Invalid tag: %j', { not: not(), fuzzy, exact, type, id, name } );
 		throw new Error( 'Attempted to filter a tag in a way that is not supported.' );
 	}
 	parseFandom( term ) {
 		return this._parseTag( term );
 	}
 	parseWarning( term ) {
+		return this._parseTag( term );
+	}
+	parseCategory( term ) {
 		return this._parseTag( term );
 	}
 	parseRelationship( term ) {
@@ -140,6 +159,7 @@ export class Ao3Query extends Query {
 	}
 
 	afterParse() {
+		debug( 'Before qs merge: %s %j', this.filters.length, this.qs );
 		this.qs = _.mergeWith( {
 			tag_id: 'RWBY',
 			work_search: {
@@ -147,12 +167,14 @@ export class Ao3Query extends Query {
 			},
 		}, ...this.qs, ( a, b ) => {
 			if( _.isArray( a ) ) {
-				return a.concat( b );
+				return a.concat( b ).join( ',' );
 			} else if( _.isString( a ) ) {
 				return a + ' ' + b;
 			}
 			return undefined;
 		} );
+		this.qs = _.deepMapValues( this.qs, ( v ) => _.isArray( v ) ? v.join( ',' ) : v );
+		debug( 'After qs merge: %s %j', this.filters.length, this.qs );
 	}
 
 	request( page, credentials ) {

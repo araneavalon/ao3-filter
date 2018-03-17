@@ -6,19 +6,24 @@ import { connect } from 'react-redux';
 
 import _ from 'lodash';
 
-import { Accordion, Label, TriCheckbox } from 'av/elements';
+import { Accordion, Button, Label, TriCheckbox } from 'av/elements';
 
-import {
-	setStaticFilter
-} from '../actions';
+import { setStaticFilter, submitFilter } from '../actions';
 
 
 @connect(
 	( { filter } ) => ( {
-		filter,
+		filter: _.omit( filter, [ 'terms' ] ),
 	} ),
 	( dispatch ) => ( {
 		setStaticFilter: _.curry( ( name, key, value ) => dispatch( setStaticFilter( name, key, value ) ) ),
+		submitFilter: ( filter ) => dispatch( submitFilter( filter ) ),
+	} ),
+	( { ...s }, { submitFilter, ...a }, p ) => ( {
+		...s,
+		...a,
+		...p,
+		submitFilter: () => submitFilter( s.filter ),
 	} )
 )
 export class FilterSidebar extends React.Component {
@@ -27,12 +32,13 @@ export class FilterSidebar extends React.Component {
 	static propTypes = {
 		filter: PropTypes.object.isRequired, // TODO
 		setStaticFilter: PropTypes.func.isRequired,
+		submitFilter: PropTypes.func.isRequired,
 	};
 
 	render() {
-		const { filter, setStaticFilter } = this.props;
+		const { filter, setStaticFilter, submitFilter } = this.props;
 		return <dl>
-			FILTER!
+			<Button onClick={ submitFilter }>Sort and Filter</Button>
 			{ [
 				[ 'Ratings', 'rating', [ 'Unrated', 'Explicit', 'Mature', 'Teen', 'General' ] ],
 				[ 'Warnings', 'warning', [
@@ -60,6 +66,7 @@ export class FilterSidebar extends React.Component {
 			<dd>
 				<TriCheckbox value={ filter.status.complete } onChange={ setStaticFilter( 'status', 'complete' ) }>Complete</TriCheckbox>
 			</dd>
+			<Button onClick={ submitFilter }>Sort and Filter</Button>
 		</dl>;
 	}
 }

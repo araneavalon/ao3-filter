@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require( 'debug' )( 'fic-request-2:query' );
 import _ from 'lodash';
 
 
@@ -12,12 +13,17 @@ export class Query {
 		this.options = options;
 		this.terms = terms;
 
+		this.boundParsers = Object.create( null );
 		this.parsers = new Proxy( this, {
 			get: ( target, _key ) => {
 				const key = `parse${_.capitalize( _key )}`;
-				return Reflect.has( target, key ) ?
-					Reflect.get( target, key ) :
-					() => ( [] );
+				if( !Reflect.has( this.boundParsers, key ) ) {
+					Reflect.set( this.boundParsers, key,
+						Reflect.has( target, key ) ?
+							Reflect.get( target, key ).bind( target ) :
+							() => null );
+				}
+				return Reflect.get( this.boundParsers, key );
 			}
 		} );
 
@@ -26,12 +32,17 @@ export class Query {
 
 		this.beforeParse();
 		for( const term of terms ) {
+			debug( 'Getting queries for term: %s %j', term.type, term );
 			const queries = this.parsers[ term.type ]( this.termPreparser( term ) );
 			for( const query of _.isArray( queries ) ? queries : [ queries ] ) {
 				if( _.isFunction( query ) ) {
+					debug( 'Adding term to filters: %s', term.type );
 					this.filters.push( query );
 				} else if( _.isObject( query ) ) {
+					debug( 'Adding term to queries: %s %j', term.type, query );
 					this.qs.push( query );
+				} else {
+					debug( 'Doing nothing with term: %s %s', term.type, query );
 				}
 			}
 		}

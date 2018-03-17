@@ -18,7 +18,7 @@ import { FilterSidebar } from 'filter';
 
 
 @connect(
-	( { works: { page, loading, list }, filters: { terms } } ) => ( {
+	( { works: { page, loading, list }, filter: { terms } } ) => ( {
 		page,
 		loading,
 		works: list,
@@ -37,13 +37,13 @@ import { FilterSidebar } from 'filter';
 @jss( () => ( {
 	works: {
 		display: 'flex',
+		alignItems: 'flex-start',
 	},
 	list: {
 		width: '66%',
 	},
 	sidebar: {
 		width: '33%',
-		height: '100px',
 		marginTop: 'calc( 40px + .643em )',
 		padding: [ '.429em', '.75em' ],
 	},
