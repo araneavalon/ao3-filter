@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require( 'debug' )( 'fic-request-2' );
+const debug = require( 'debug' )( 'fic-request-2:request' );
 import _ from 'lodash';
 
 import { Cache } from './cache';
@@ -54,7 +54,7 @@ export class Request {
 			page: _.map( this.sites, ( { parseWorks }, key ) =>
 				( { [ key ]: query }, page ) =>
 					query.request( page, credentials[ key ] )
-						.then( ( html ) => parseWorks( html, credentials[ key ] ) )
+						.then( ( html ) => ( html != null ) ? parseWorks( html, credentials[ key ] ) : [] )
 						.then( ( works ) => query.filter( works ) ) ),
 		};
 		this.requests.add( id, request );
@@ -68,6 +68,7 @@ export class Request {
 				for( let i = 0; i < b.length; ++i ) {
 					debug( 'Checking buffer: %s %s', i, b[ i ].length );
 					if( b[ i ].length <= 0 ) {
+						debug( 'Doing request: %s %s', i, rawPages[ i ] );
 						buffers[ i ] = page[ i ]( queries, rawPages[ i ]++ );
 					}
 				}
@@ -92,14 +93,20 @@ export class Request {
 				return out;
 			} );
 	}
-	fillCache( min, queries, request ) {
-		debug( 'Filling cache: %s >= %s', request.cache.length, min );
+	fillCache( min, queries, request, tries = 0 ) {
+		debug( 'Filling cache: (%s) %s >= %s', tries, request.cache.length, min );
+		if( tries > this.maxTries ) {
+			return Promise.reject( new Error( 'Max tries exceeded. Check your filter.' ) );
+		}
 		if( request.cache.length >= min ) {
 			return Promise.resolve( request.cache );
 		}
 		return this.orderChunk( queries, request )
-			.then( ( works ) => ( request.cache = request.cache.concat( works ) ) )
-			.then( () => this.fillCache( min, queries, request ) );
+			.then( ( works ) => {
+				request.cache = request.cache.concat( works );
+				return works.length <= 0;
+			} )
+			.then( ( empty ) => this.fillCache( min, queries, request, empty ? ( tries + 1 ) : 0 ) );
 	}
 
 	page( page, terms, credentials = {} ) {

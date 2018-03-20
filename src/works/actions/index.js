@@ -56,7 +56,7 @@ export const GET_WORKS_REQUEST = `${__filename}:GET_WORKS_REQUEST`;
 export const GET_WORKS_RESPONSE = `${__filename}:GET_WORKS_RESPONSE`;
 export const getWorks = ( page, terms ) => ( dispatch ) => {
 	dispatch( { type: GET_WORKS_REQUEST, page } );
-	return fetch.get( `/works/all/page/${page}`, { terms: JSON.stringify( TERMS.concat( terms ) ) }, { credentials: 'same-origin' } )
+	return fetch.get( `/works/all/page/${page}`, { terms: JSON.stringify( terms ) }, { credentials: 'same-origin' } )
 		.then( ( response ) => response.json() )
 		.then( ( { works } ) => {
 			dispatch( { type: GET_WORKS_RESPONSE, page, works } );

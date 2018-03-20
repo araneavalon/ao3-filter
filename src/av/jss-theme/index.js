@@ -48,7 +48,6 @@ export class ThemeProvider extends React.PureComponent {
 
 
 	render() {
-		console.log( this.theme );
 		return <JssThemeProvider theme={ this.theme }>
 			{ React.Children.only( this.props.children ) }
 		</JssThemeProvider>;
