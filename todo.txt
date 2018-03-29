@@ -1,2 +1,13 @@
-Make sure that the work display ui handles the new work format.
 Add ao3 gifts.
+
+Caching:
+  When parsing a work:
+    parse the id
+    check the cache for the id
+    if found, check update date (gonna have to find some way around this for ao3, I think, since I don't want to be making 20 requests every page constantly)
+    if not found, or if out of date, parse and add to cache
+  When doing a query:
+    get a page of results like normal, and parse
+    filter the parsed results according to the normal filter
+    check the cache to see if this has cached results
+    
