@@ -1,6 +1,6 @@
 'use strict';
 
-import { getDatabase } from './server/db';
+import { db } from '../server/db';
 
 // ff, ao3
 const AUTHORS = [
@@ -8,7 +8,7 @@ const AUTHORS = [
 	[ 'Vena Sara', 'KryHeart_Ardy' ],
 ];
 
-getDatabase()
+db.promise
 	.then( ( db ) => {
 		db.authors.findAndRemove( { name: { '$containsAny': AUTHORS.reduce( ( a, aa ) => a.concat( aa ), [] ) } } );
 		db.authors.insert( AUTHORS.map( ( names ) => ( {
@@ -25,7 +25,7 @@ getDatabase()
 		console.error( 'Database Action Error' );
 		console.error( error );
 	} )
-	.then( () => getDatabase() )
+	.then( () => db.promise )
 	.then( ( db ) => db.saveDatabase() )
 	.then( () => console.log( 'Database Saved Successfully' ) )
 	.catch( ( error ) => {

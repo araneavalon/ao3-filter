@@ -10,4 +10,13 @@ Caching:
     get a page of results like normal, and parse
     filter the parsed results according to the normal filter
     check the cache to see if this has cached results
-    
+    If so, stop requesting. If not, request another page.
+
+  Parse Terms
+  Cache Queries
+  get page from qs
+    compare to cached
+    on cache miss, insert/update database
+    on cache hit, break
+  query db from terms
+    terms -> db query object

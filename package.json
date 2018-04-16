@@ -62,7 +62,7 @@
     "watchify": "^3.9.0"
   },
   "scripts": {
-    "gulp": "gulp",
+    "gulp": "gulp"
   },
   "author": "Erin Valon",
   "license": "UNLICENSED"

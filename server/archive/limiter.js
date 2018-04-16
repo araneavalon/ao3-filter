@@ -33,6 +33,10 @@ export class Limiter {
 	}
 
 	execute( fns ) {
+		if( fns.length <= 0 ) {
+			this.debug( 'Executing %s ()', fns.length );
+			return Promise.resolve( [] );
+		}
 		const startingIndex = this.index;
 		const [ starters, promises ] = _.unzip( fns.map( ( fn, i, a ) => this.wrap( fn, i, a.length - 1 ) ) );
 		this.debug( 'Executing %s (%s, %s-%s)', fns.length, this.group++, startingIndex, this.index - 1 );

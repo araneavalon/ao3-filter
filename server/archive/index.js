@@ -3,7 +3,7 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
 
-import { FFScraper } from './scrape';
+import { FFScraper, Ao3Scraper } from './scrape';
 
 const ARCHIVE_DIR = 'data/archived/';
 const ALLOWED_ORIGINS = [
@@ -13,6 +13,14 @@ const ALLOWED_ORIGINS = [
 ];
 
 const route = new Router();
+
+const getScraper = ( site, id, title, options ) => {
+	switch( site ) {
+		case 'ff': return new FFScraper( id, title, options );
+		case 'ao3': return new Ao3Scraper( id, title, options );
+		default: throw new Error( `Invalid Site: "${site}".` );
+	}
+};
 
 
 route.use( '/', ( req, res, next ) => {
@@ -25,18 +33,17 @@ route.use( '/', ( req, res, next ) => {
 } );
 route.use( '/', bodyParser.json() );
 
-route.post( '/ff', ( req, res ) => {
-	const { id, title, header, chapters } = req.body;
-	( new FFScraper( id, title, { archiveDir: ARCHIVE_DIR } ) )
+route.post( '/:site', ( req, res ) => {
+	const { site } = req.params,
+		{ id, title, header, chapters = [] } = req.body;
+	getScraper( site, id, title, { archiveDir: ARCHIVE_DIR } )
 		.getChapters( header, chapters )
 		.catch( ( e ) => console.error( e ) );
 	res.status( 200 ).send( [
+		`Archiving from "${site}".`,
 		header && 'Attempting to archive header.',
 		`Attempting to archive ${chapters.length} chapters.`
 	].filter( ( s ) => s ).join( '\n' ) );
-} );
-route.post( '/ao3', ( req, res ) => {
-	res.status( 200 ).send( 'ok' );
 } );
 
 

@@ -26,24 +26,28 @@ export class Parser {
 		};
 	}
 
-	getBaseWork() {
+	constructor() {
+		this.parseWorks = this.parseWorks.bind( this );
+	}
+
+	getWrappedWork() {
 		const work = this.constructor.DEFAULT_WORK;
-		return new Proxy( work, {
-			apply: () => {
-				return work;
-			},
-			set: ( work, key, value ) => {
-				if( typeof value !== 'function' ) {
-					work[ key ] = value;
-					return true;
-				}
+		const wrapped = {
+			get: ( key ) => work[ key ],
+			set: ( key, fn ) => wrapped.run( key, () => work[ key ] = fn() ),
+			run: ( key, fn ) => {
 				try {
-					work[ key ] = value( work[ key ] );
+					fn();
 				} catch( e ) {
 					work.errors.push( `Unable to parse work.${key}: "${e.message}"` );
 				}
-				return true;
-			}
-		} );
+			},
+			unwrap: () => work,
+		};
+		return wrapped;
+	}
+
+	async *parseWorks( html ) {
+		throw new Error( `${this.constructor.name}.*parseWorks(${html.length}) not implemented.` );
 	}
 }
