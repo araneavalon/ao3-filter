@@ -32,23 +32,22 @@ export class Pages extends React.Component {
 
 	static propTypes = {
 		page: PropTypes.number.isRequired,
-		onChange: PropTypes.func.isRequired,
 		classes: PropTypes.object.isRequired,
 	};
 
 	render() {
-		const { classes, page, onChange } = this.props;
+		const { classes, page } = this.props;
 		return <div className={ classes.container }>
-			<Button selected={ page === 1 } disabled={ page < 2 } onClick={ onChange.bind( null, page - 1 ) }>Previous</Button>
+			<Button selected={ page === 1 } disabled={ page < 2 } to={ `/works/page/${page - 1}` }>Previous</Button>
 			<div className={ classes.numbered }>
-				<Button selected={ page === 1 } disabled={ page === 1 } onClick={ onChange.bind( null, 1 ) }>1</Button>
-				<Button selected={ page === 2 } disabled={ page === 2 } onClick={ onChange.bind( null, 2 ) }>2</Button>
+				<Button selected={ page === 1 } disabled={ page === 1 } to="/works/page/1">1</Button>
+				<Button selected={ page === 2 } disabled={ page === 2 } to="/works/page/2">2</Button>
 				{ page >= 9 &&
 					<span className="spacer">...</span> }
 				{ _.range( ( page < 9 ) ? 3 : page - 4, Math.max( 9, page + 4 ) + 1 ).map( ( n ) =>
-					<Button key={ n } selected={ page === n } disabled={ page === n } onClick={ onChange.bind( null, n ) }>{ n }</Button> ) }
+					<Button key={ n } selected={ page === n } disabled={ page === n } to={ `/works/page/${n}` }>{ n }</Button> ) }
 			</div>
-			<Button selected={ false } onClick={ onChange.bind( null, page + 1 ) }>Next</Button>
+			<Button selected={ false } to={ `/works/page/${page + 1}` }>Next</Button>
 		</div>;
 	}
 }

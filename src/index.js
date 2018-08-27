@@ -5,25 +5,24 @@ import 'av/fontawesome';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-
-import reducer from './reducer';
+import { createStore } from './store';
 import { App } from './app';
-
 
 import theme from './theme.json';
 import { ThemeProvider } from 'av/jss-theme';
 
-const store = createStore( reducer, applyMiddleware( thunk ) );
+const store = createStore( window.REDUX_INITIAL_STATE );
 window.getState = () => store.getState();
 
-ReactDOM.render(
+ReactDOM.hydrate(
 	<ThemeProvider theme={ theme }>
 		<ReduxProvider store={ store }>
-			<App />
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
 		</ReduxProvider>
 	</ThemeProvider>,
 	document.getElementById( 'root' )

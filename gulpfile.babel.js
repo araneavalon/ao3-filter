@@ -25,35 +25,20 @@ import VENDOR_EXPORTS from './vendor-bundle.json';
 const VENDOR_IMPORTS = VENDOR_EXPORTS.map( ( module ) => module.expose || module );
 
 const options = {
-	get server() {
-		return {
-			root: './server',
-			src: 'server/**/*.js',
-			json: 'server/**/*.json',
-			dest: 'build/server',
-		};
-	},
-	get app() {
-		return {
-			root: './src',
-			assets: './static/',
-			src: 'src/**/*.js',
-			dest: 'build/src',
-			file: 'app.js',
-		};
-	},
-	get vendor() {
-		return {
-			dest: 'build/src',
-			file: 'vendor.js',
-		};
+	root: './src',
+	src: 'src/**/*.js',
+	json: 'src/**/*.json',
+	dest: 'build',
+
+	entry: {
+		app: 'index.js',
+		server: 'server/index.js',
 	},
 
 	get browserify() {
 		return {
-			entries: [ `${options.app.root}/index.js` ],
-			paths: [ './node_modules', options.app.root ],
-			debug: development(),
+			entries: [ `${options.root}/${options.entry.app}` ],
+			paths: [ './node_modules', options.root ],
 		};
 	},
 	get watchify() {
@@ -81,12 +66,12 @@ const _makeBundle = ( b ) => {
 					gutil.log( 'Browserify Error:\n', stack );
 				}
 			} )
-			.pipe( source( options.app.file ) )
+			.pipe( source( options.file ) )
 			.pipe( buffer() )
 			.pipe( production( uglify() ) )
 			.pipe( development( sourcemaps.init( { loadMaps: true } ) ) )
 			.pipe( development( sourcemaps.write() ) )
-			.pipe( gulp.dest( options.app.dest ) );
+			.pipe( gulp.dest( options.dest ) );
 	};
 };
 
@@ -123,11 +108,8 @@ gulp.task( '-deps:app', () => {
 	return b.bundle();
 } );
 
-gulp.task( '-lint:app', () => {
-	return _lint( options.app.src );
-} );
-gulp.task( '-lint:server', () => {
-	return _lint( options.server.src );
+gulp.task( '-lint', () => {
+	return _lint( options.src );
 } );
 
 
@@ -138,33 +120,38 @@ gulp.task( '-build:vendor', () => {
 	return browserify( { debug: false } )
 		.require( VENDOR_EXPORTS )
 		.bundle()
-		.pipe( source( options.vendor.file ) )
+		.pipe( source( 'vendor.js' ) )
 		.pipe( buffer() )
 		.pipe( production( uglify() ) )
-		.pipe( gulp.dest( options.vendor.dest ) );
+		.pipe( gulp.dest( `${options.dest}/bundles` ) );
 } );
 gulp.task( '-build:server', () => {
 	return gutil.allStreams( [
-		gulp.src( options.server.src )
+		gulp.src( options.src )
 			.pipe( babel( {
 				plugins: [ [ 'module-resolver', {
-					root: options.server.root
+					root: options.root
 				} ] ]
 			} ) ),
-		gulp.src( options.server.json ),
+		gulp.src( options.json ),
 	] )
-		.pipe( gulp.dest( options.server.dest ) );
+		.pipe( gulp.dest( `${options.dest}/bundles` ) );
 } );
 
 
 gulp.task( '-start:server', ( cb ) => {
-	spawn( 'node', [ `${options.server.dest}/index.js` ], { stdio: 'inherit' } )
+	spawn( 'node', [ `${options.dest}/${options.entry.server}` ], { stdio: 'inherit' } )
+		.on( 'close', ( code ) => cb( code !== 0 ? code : null ) );
+} );
+
+gulp.task( '-watch:server', ( cb ) => {
+	spawn( 'nodemon', [ '--exec', 'babel-node', `${options.root}/${options.entry.server}` ], { stdio: 'inherit' } )
 		.on( 'close', ( code ) => cb( code !== 0 ? code : null ) );
 } );
 
 gulp.task( '-watch:app', () => {
 	const b = watchify( browserify( options.watchify ) ),
-		lintAndBundle = () => gutil.sequenceStreams( _lint( options.app.src, false ), _makeBundle( b ) );
+		lintAndBundle = () => gutil.sequenceStreams( _lint( options.src, false ), _makeBundle( b ) );
 	b.on( 'update', lintAndBundle );
 	b.on( 'log', gutil.log );
 	lintAndBundle();
@@ -174,20 +161,18 @@ gulp.task( '-watch:app', () => {
 gulp.task( 'deps:app', [ '-deps:app' ] );
 gulp.task( 'deps', sequence( 'deps:app' ) );
 
-gulp.task( 'lint:app', [ '-lint:app' ] );
-gulp.task( 'lint:server', [ '-lint:server' ] );
-gulp.task( 'lint', sequence( 'lint:server', 'lint:app' ) );
+gulp.task( 'lint', [ '-lint' ] );
 
-gulp.task( 'build:prod:app', sequence( '-set:prod', '-lint:app', '-build:app' ) );
-gulp.task( 'build:dev:app', sequence( '-set:dev', '-lint:app', '-build:app' ) );
+gulp.task( 'build:prod:app', sequence( '-set:prod', '-lint', '-build:app' ) );
+gulp.task( 'build:dev:app', sequence( '-set:dev', '-lint', '-build:app' ) );
 gulp.task( 'build:app', [ 'build:prod:app' ] );
 
 gulp.task( 'build:prod:vendor', sequence( '-set:prod', '-build:vendor' ) );
 gulp.task( 'build:dev:vendor', sequence( '-set:dev', '-build:vendor' ) );
 gulp.task( 'build:vendor', [ 'build:prod:vendor' ] );
 
-gulp.task( 'build:prod:server', sequence( '-set:prod', '-lint:server', '-build:server' ) );
-gulp.task( 'build:dev:server', sequence( '-set:dev', '-lint:server', '-build:server' ) );
+gulp.task( 'build:prod:server', sequence( '-set:prod', '-lint', '-build:server' ) );
+gulp.task( 'build:dev:server', sequence( '-set:dev', '-lint', '-build:server' ) );
 gulp.task( 'build:server', [ 'build:prod:server' ] );
 
 gulp.task( 'start:prod:server', sequence( 'build:prod:server', '-start:server' ) );
@@ -196,5 +181,8 @@ gulp.task( 'start:server', [ 'start:prod:server' ] );
 
 gulp.task( 'watch:dev:app', sequence( '-set:dev', '-watch:app' ) );
 gulp.task( 'watch:app', [ 'watch:dev:app' ] );
+gulp.task( 'watch:dev:server', sequence( '-set:dev', '-watch:server' ) );
+gulp.task( 'watch:server', [ 'watch:dev:server' ] );
+gulp.task( 'watch', [ 'watch:app', 'watch:server' ] );
 
 gulp.task( 'default', sequence( [ 'build:vendor', 'build:app' ], 'start:server' ) );

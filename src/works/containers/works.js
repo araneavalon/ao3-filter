@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import autobind from 'autobind-decorator';
+// import autobind from 'autobind-decorator';
 import jss from 'react-jss';
 import { connect } from 'react-redux';
 
@@ -57,7 +57,9 @@ export class Works extends React.Component {
 		works: Types.works.isRequired,
 		getWorks: PropTypes.func.isRequired,
 		classes: PropTypes.object.isRequired,
-	}
+	};
+
+	static getInitialData = ( { page } ) => getWorks( page );
 
 	componentDidMount() {
 		const { getWorks, page } = this.props;
@@ -65,22 +67,22 @@ export class Works extends React.Component {
 		getWorks( page );
 	}
 
-	@autobind
-	getPage( page ) {
-		window.scrollTo( window.scrollX, 0 );
-		this.props.getWorks( page );
-	}
+	// @autobind
+	// getPage( page ) {
+	// 	window.scrollTo( window.scrollX, 0 );
+	// 	this.props.getWorks( page );
+	// }
 
 	render() {
 		const { loading, page, works, classes } = this.props;
 		return <div className={ classes.works }>
 			<div className={ classes.list }>
-				<Pages page={ page } onChange={ this.getPage } />
+				<Pages page={ page } />
 				{ loading &&
 					<div>Loading!</div> }
 				{ !loading &&
 					<WorkList works={ works } /> }
-				<Pages page={ page } onChange={ this.getPage } />
+				<Pages page={ page } />
 			</div>
 			<div className={ classes.sidebar }>
 				<FilterSidebar />

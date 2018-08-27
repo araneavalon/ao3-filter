@@ -1,7 +1,9 @@
 'use strict';
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import autobind from 'autobind-decorator';
 import jss from 'react-jss';
 import cx from 'classnames';
 
@@ -47,16 +49,33 @@ export class Button extends React.PureComponent {
 		selected: PropTypes.bool,
 		disabled: PropTypes.bool,
 		onClick: PropTypes.func,
+		to: PropTypes.oneOfType( [ PropTypes.string, PropTypes.shape( {
+			pathname: PropTypes.string,
+			search: PropTypes.string,
+			hash: PropTypes.string,
+			state: PropTypes.object,
+		} ) ] ).isRequired,
 		classes: PropTypes.object.isRequired,
 		children: PropTypes.node.isRequired,
+	};
+
+	@autobind
+	onClick( event ) {
+		const { disabled, onClick } = this.props;
+		if( disabled ) {
+			event.preventDefault();
+		} else if( onClick ) {
+			onClick( event );
+		}
 	}
 
 	render() {
-		const { classes, className, style, selected, disabled, onClick, children } = this.props;
-		return <div
+		const { classes, className, style, selected, disabled, to, onClick, children } = this.props;
+		return <Link
 			className={ cx( classes.button, { selected, disabled }, className ) }
 			style={ style }
-			onClick={ disabled ? null : onClick }
-		>{ children }</div>;
+			to={ to }
+			onClick={ onClick }
+		>{ children }</Link>;
 	}
 }

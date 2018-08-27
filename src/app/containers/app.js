@@ -1,16 +1,16 @@
 'use strict';
 
 import React from 'react';
+import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import jss from 'react-jss';
 import { connect } from 'react-redux';
 
-import { setPage } from '../actions';
 import { Types } from '../reducer';
 
 import { Button } from 'av/elements';
-import { Searches } from 'searches';
-import { Works } from 'works';
+
+import routes from 'routes';
 
 
 @jss( ( $ ) => ( {
@@ -52,31 +52,27 @@ import { Works } from 'works';
 } ) )
 @connect(
 	( { app: { page } } ) => ( { page } ),
-	( dispatch ) => ( {
-		setPage: ( page ) => dispatch( setPage( page ) )
-	} )
 )
 export class App extends React.Component {
 	static displayName = __filename;
 
 	static propTypes = {
 		page: Types.page.isRequired,
-		setPage: PropTypes.func.isRequired,
 		classes: PropTypes.object.isRequired
 	}
 
 	render() {
-		const { classes, page, setPage } = this.props;
+		const { classes, page } = this.props;
 		return <div className={ classes.container }>
 			<div className={ classes.header }>
-				<Button selected={ page === 'works' } onClick={ setPage.bind( null, 'works' ) }>Works</Button>
-				<Button selected={ page === 'searches' } onClick={ setPage.bind( null, 'searches' ) }>Searches</Button>
+				<Button selected={ page === 'works' } to="/works/page/1">Works</Button>
+				<Button selected={ page === 'searches' } to="/searches">Searches</Button>
 			</div>
 			<div className={ classes.content }>
-				{ page === 'searches' &&
-					<Searches /> }
-				{ page === 'works' &&
-					<Works /> }
+				<Switch>
+					{ routes.map( ( route ) =>
+						<Route key={ route.path } { ...route } /> ) }
+				</Switch>
 			</div>
 		</div>;
 	}
