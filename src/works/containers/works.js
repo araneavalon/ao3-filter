@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-// import autobind from 'autobind-decorator';
+import autobind from 'autobind-decorator';
 import jss from 'react-jss';
 import { connect } from 'react-redux';
 
@@ -67,22 +67,21 @@ export class Works extends React.Component {
 		getWorks( page );
 	}
 
-	// @autobind
-	// getPage( page ) {
-	// 	window.scrollTo( window.scrollX, 0 );
-	// 	this.props.getWorks( page );
-	// }
+	@autobind
+	getUrl( page ) {
+		return `/works/page/${page}`;
+	}
 
 	render() {
 		const { loading, page, works, classes } = this.props;
 		return <div className={ classes.works }>
 			<div className={ classes.list }>
-				<Pages page={ page } />
+				<Pages page={ page } to={ this.getUrl } />
 				{ loading &&
 					<div>Loading!</div> }
 				{ !loading &&
 					<WorkList works={ works } /> }
-				<Pages page={ page } />
+				<Pages page={ page } to={ this.getUrl } />
 			</div>
 			<div className={ classes.sidebar }>
 				<FilterSidebar />

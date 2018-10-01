@@ -1,12 +1,12 @@
 [ {
 	"margin": {
 		"small": "4px",
-		"large": "9px",
+		"large": "9px"
 	},
 	"fontSize": {
 		"small": ".85rem",
 		"normal": "1rem",
-		"large": "1.15rem",
+		"large": "1.15rem"
 	},
 
 	"grey": {
@@ -17,7 +17,7 @@
 		"4": "#444",
 		"3": "#333",
 		"2": "#222",
-		"1": "#111",
+		"1": "#111"
 	},
 
 	"colors": {
@@ -35,31 +35,31 @@
 		"mid": "#555",
 		"dark": "#444",
 		"darker": "#222",
-		"darkest": "#111",
-	},
+		"darkest": "#111"
+	}
 }, {
 	"page": {
 		"color": "#eee",
 		"backgroundColor": "#333",
 		"fontSize": "16px",
-		"lineHeight": "1.286",
+		"lineHeight": "1.286"
 	},
 
 	"borderColor": {
 		"normal": "$.colors.darker",
-		"hover": "$.colors.darkest",
+		"hover": "$.colors.darkest"
 	},
 	"backgroundColor": {
 		"normal": "$.colors.dark",
 		"hover": "$.colors.mid",
-		"active": "$.colors.light",
+		"active": "$.colors.light"
 	},
 
 	"link": {
 		"blue": "#5998d6",
 		"light": "$.colors.lightest",
 		"dark": "$.colors.darkest",
-		"visited": "$.colors.lighter",
+		"visited": "$.colors.lighter"
 	},
 
 	"checkbox": {
@@ -75,6 +75,5 @@
 		"unchecked": {
 
 		}
-	},
-	
+	}
 } ]

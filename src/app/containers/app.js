@@ -39,6 +39,8 @@ import routes from 'routes';
 			fontFamily: 'inherit',
 			verticalAlign: 'baseline',
 			listStyle: 'none',
+			textDecoration: 'none',
+			color: 'inherit',
 			margin: 0,
 			padding: 0,
 		},

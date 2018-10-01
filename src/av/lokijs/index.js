@@ -7,7 +7,7 @@ export class Loki extends _Loki {
 	constructor( filename, collections, options = {} ) {
 		super( filename, options );
 
-		this.proimse = new Promise( ( pass, fail ) =>
+		this.promise = new Promise( ( pass, fail ) =>
 			this.loadDatabase( ( error ) =>
 				error ? fail( error ) : pass( this ) ) );
 

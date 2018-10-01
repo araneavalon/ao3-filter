@@ -10,7 +10,7 @@ export const db = new Loki( 'database.db', [ 'works', 'qsCache', 'authors', 'tag
 
 
 export function createDatabase() {
-	return db.proimse.then( ( db ) => {
+	return db.promise.then( ( db ) => {
 		db.addOrUpdateCollection( 'qsCache', {
 			clone: true,
 			unique: [ 'hash' ],

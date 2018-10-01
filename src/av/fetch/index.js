@@ -1,7 +1,7 @@
 'use strict';
 
 import querystring from 'querystring';
-const _fetch = window.fetch;
+const _fetch = process.browser ? window.fetch : require( 'node-fetch' );
 
 export const fetch = ( ...args ) => _fetch( ...args );
 

@@ -8,7 +8,7 @@ export default [ {
 	component: Searches,
 	exact: true,
 }, {
-	path: '/works/:page',
+	path: '/works/page/:page',
 	component: Works,
 	exact: true,
 } ];

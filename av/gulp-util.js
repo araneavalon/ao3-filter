@@ -26,19 +26,23 @@ export const avGulpUtil = {
 			done = true;
 		};
 
-		_callIfFunction( src )
-			.on( 'data', () => {} )
-			.on( 'error', next )
-			// Just to be really really sure that it will actually catch the end.
-			.on( 'end', next )
-			.on( 'close', next )
-			.on( 'finish', next );
+		avGulpUtil.onEnd( _callIfFunction( src ), next );
 
 		return t;
 	},
 
 	allStreams( streams ) {
 		return mergeStream( ...streams );
+	},
+
+	onEnd( stream, cb ) {
+		stream
+			.on( 'data', () => {} )
+			.on( 'error', cb )
+			// Just to be really really sure that it will actually catch the end.
+			.on( 'end', cb )
+			.on( 'close', cb )
+			.on( 'finish', cb );
 	}
 };
 

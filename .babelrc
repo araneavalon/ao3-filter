@@ -1,16 +1,19 @@
 {
 	"presets": [
-		[ "env", {
-			"exclude": [
-				"transform-regenerator",
-			],
+		[ "@babel/preset-env", {
+			"targets": {
+				"node": "current",
+				"chrome": "65",
+			},
 		} ]
 	],
 	"plugins": [
-		// transform-decorators-legacy must come before transform-class-properties
-		"transform-decorators-legacy",
-		"transform-class-properties",
-		"transform-object-rest-spread",
-		"transform-react-jsx",
+		[ "babel-plugin-module-resolver", { "root": "./src" } ],
+		"./src/av/utils/display-name",
+		// plugin-proposal-decorators must come before plugin-proposal-class-properties
+		[ "@babel/plugin-proposal-decorators", { "legacy": true } ],
+		"@babel/plugin-proposal-class-properties",
+		"@babel/plugin-proposal-object-rest-spread",
+		"@babel/plugin-transform-react-jsx",
 	],
 }

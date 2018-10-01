@@ -1,6 +1,5 @@
 'use strict';
 
-import 'babel-polyfill';
 import 'av/fontawesome';
 
 import React from 'react';
@@ -8,13 +7,14 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { createStore } from './store';
-import { App } from './app';
+import { createStore } from 'store';
+import { App } from 'app';
 
-import theme from './theme.json';
+import theme from 'theme.json';
 import { ThemeProvider } from 'av/jss-theme';
 
 const store = createStore( window.REDUX_INITIAL_STATE );
+delete window.REDUX_INITIAL_STATE;
 window.getState = () => store.getState();
 
 ReactDOM.hydrate(
@@ -25,5 +25,9 @@ ReactDOM.hydrate(
 			</BrowserRouter>
 		</ReduxProvider>
 	</ThemeProvider>,
-	document.getElementById( 'root' )
+	document.getElementById( 'root' ),
+	() => {
+		const css = document.getElementById( 'jss-initial-state' );
+		css.parentNode.removeChild( css );
+	}
 );

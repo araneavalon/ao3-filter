@@ -1,7 +1,7 @@
 'use strict';
 
 import { asyncActionCreator } from 'av/utils';
-import db from 'local-db';
+// import db from 'local-db';
 
 import { addSearch } from './search';
 import { addBlacklist } from './blacklist';

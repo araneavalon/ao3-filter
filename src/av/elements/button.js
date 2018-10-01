@@ -54,7 +54,7 @@ export class Button extends React.PureComponent {
 			search: PropTypes.string,
 			hash: PropTypes.string,
 			state: PropTypes.object,
-		} ) ] ).isRequired,
+		} ) ] ),
 		classes: PropTypes.object.isRequired,
 		children: PropTypes.node.isRequired,
 	};
@@ -70,12 +70,13 @@ export class Button extends React.PureComponent {
 	}
 
 	render() {
-		const { classes, className, style, selected, disabled, to, onClick, children } = this.props;
-		return <Link
+		const { classes, className, style, selected, disabled, to, onClick, children } = this.props,
+			Component = ( to != null ) ? Link : 'div';
+		return <Component
 			className={ cx( classes.button, { selected, disabled }, className ) }
 			style={ style }
 			to={ to }
 			onClick={ onClick }
-		>{ children }</Link>;
+		>{ children }</Component>;
 	}
 }

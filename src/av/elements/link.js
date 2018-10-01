@@ -33,7 +33,7 @@ export class Link extends React.PureComponent {
 		style: PropTypes.object,
 		className: PropTypes.string,
 		classes: PropTypes.object.isRequired,
-	}
+	};
 
 	render() {
 		const { classes, className, style, href, children } = this.props;

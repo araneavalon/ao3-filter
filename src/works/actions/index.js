@@ -55,10 +55,12 @@ TERMS.push(
 export const GET_WORKS_REQUEST = `${__filename}:GET_WORKS_REQUEST`;
 export const GET_WORKS_RESPONSE = `${__filename}:GET_WORKS_RESPONSE`;
 export const getWorks = ( page, terms ) => ( dispatch ) => {
+	console.log( 'dispatch initial' );
 	dispatch( { type: GET_WORKS_REQUEST, page } );
 	return fetch.get( `/works/all/page/${page}`, { terms: JSON.stringify( terms ) }, { credentials: 'same-origin' } )
 		.then( ( response ) => response.json() )
 		.then( ( { works } ) => {
+			console.log( 'received response' );
 			dispatch( { type: GET_WORKS_RESPONSE, page, works } );
 		} )
 		.catch( ( error ) => {

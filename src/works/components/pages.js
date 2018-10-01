@@ -32,22 +32,23 @@ export class Pages extends React.Component {
 
 	static propTypes = {
 		page: PropTypes.number.isRequired,
+		to: PropTypes.func.isRequired,
 		classes: PropTypes.object.isRequired,
 	};
 
 	render() {
-		const { classes, page } = this.props;
+		const { classes, page, to } = this.props;
 		return <div className={ classes.container }>
-			<Button selected={ page === 1 } disabled={ page < 2 } to={ `/works/page/${page - 1}` }>Previous</Button>
+			<Button selected={ page === 1 } disabled={ page < 2 } to={ to( page - 1 ) }>Previous</Button>
 			<div className={ classes.numbered }>
-				<Button selected={ page === 1 } disabled={ page === 1 } to="/works/page/1">1</Button>
-				<Button selected={ page === 2 } disabled={ page === 2 } to="/works/page/2">2</Button>
+				<Button selected={ page === 1 } disabled={ page === 1 } to={ to( 1 ) }>1</Button>
+				<Button selected={ page === 2 } disabled={ page === 2 } to={ to( 2 ) }>2</Button>
 				{ page >= 9 &&
 					<span className="spacer">...</span> }
 				{ _.range( ( page < 9 ) ? 3 : page - 4, Math.max( 9, page + 4 ) + 1 ).map( ( n ) =>
-					<Button key={ n } selected={ page === n } disabled={ page === n } to={ `/works/page/${n}` }>{ n }</Button> ) }
+					<Button key={ n } selected={ page === n } disabled={ page === n } to={ to( n ) }>{ n }</Button> ) }
 			</div>
-			<Button selected={ false } to={ `/works/page/${page + 1}` }>Next</Button>
+			<Button selected={ false } to={ to( page + 1 ) }>Next</Button>
 		</div>;
 	}
 }
